@@ -1,3 +1,11 @@
+
+-- Event handler frame, needs cleaned up
+local f = CreateFrame("Frame")
+f:SetScript("OnLoad", function() FRC_OnLoad() end)
+f:SetScript("OnUpdate", function() FRC_OnUpdate(arg1) end)
+f:SetScript("OnEvent", function() FRC_OnEvent(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) end)
+
+
 ------------------------------------------------------
 -- ReagentCost.lua
 ------------------------------------------------------

@@ -8,4 +8,7 @@
 ## X-LoadOn-Crafting: true
 ## X-LoadOn-Slash: /reagentcost, /rc
 
-ReagentCost.xml
+GFWUtils.lua
+GFWTable.lua
+ReagentCost_VendorPrices.lua
+ReagentCost.lua
