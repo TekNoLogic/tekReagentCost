@@ -62,15 +62,15 @@ end
 function GFWUtils_temp_FormatToPattern(formatString)
 
 	local patternString = formatString;
-	
-	patternString = string.gsub(patternString, "%%%d+%$([diouXxfgbcsq])", "%%%1"); -- reordering specifiers (e.g. %2$s) stripped	
+
+	patternString = string.gsub(patternString, "%%%d+%$([diouXxfgbcsq])", "%%%1"); -- reordering specifiers (e.g. %2$s) stripped
 	patternString = string.gsub(patternString, "([%$%(%)%.%[%]%*%+%-%?%^])", "%%%1"); -- convert regex special characters
-	
+
 	patternString = string.gsub(patternString, "%%c", "(.)"); -- %c to (.)
 	patternString = string.gsub(patternString, "%%s", "(.+)"); -- %s to (.+)
 	patternString = string.gsub(patternString, "%%[du]", "(%%d+)"); -- %d to (%d+)
 	patternString = string.gsub(patternString, "%%([gf])", "(%%d+%%.*%%d*)"); -- %g or %f to (%d+%.*%d*)
-		
+
 	return patternString;
 
 end
@@ -79,7 +79,7 @@ end
 -- e.g. Split(aString, ", ") is the reverse of table.concat(aTable, ", ")
 function GFWUtils_temp_Split(aString, separator)
 	if (aString == nil) then return nil; end
-	
+
 	local t = {};
 	local function helper(segment)
 		table.insert(t, segment);
@@ -91,7 +91,7 @@ end
 -- Capitalizes the first letter of each word in aString.
 function GFWUtils_temp_TitleCase(aString)
 	if (aString == nil) then return nil; end
-	local function capWords(first, rest) 
+	local function capWords(first, rest)
 		return string.upper(first)..string.lower(rest);
 	end
 	return string.gsub(aString, "(%w)([%w_']*)", capWords);
@@ -118,10 +118,10 @@ function GFWUtils_temp_TextGSC(money, noRound)
     local GSC_NONE="|cffa0a0a0none|r";
 
 	local g, s, c = GFWUtils.GSC(money);
-	
+
 	local gsc = "";
 	if (g > 0) then
-		gsc = format(GSC_START, GSC_GOLD, g, "g");     
+		gsc = format(GSC_START, GSC_GOLD, g, "g");
 		if (s > 0) then
 			gsc = gsc..format(GSC_PART, GSC_SILVER, s, "s");
 			if (noRound and c > 0) then
@@ -214,7 +214,7 @@ if (G.Version == nil or (tonumber(G.Version) ~= nil and G.Version < GFWUTILS_THI
 	G.BuildItemLink = GFWUtils_temp_BuildItemLink;
 	G.ColorToCode = GFWUtils_temp_ColorToCode;
 	G.ColorText = GFWUtils_temp_ColorText;
-	
+
 	-- Set version number
 	G.Version = GFWUTILS_THIS_VERSION;
 end

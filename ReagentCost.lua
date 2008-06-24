@@ -31,7 +31,7 @@ FRC_CraftLock.EventCooldownTime = 1;
 
 function FRC_CraftFrame_SetSelection(id)
 	FRC_Orig_CraftFrame_SetSelection(id);
-	
+
 	if ( not id ) then
 		return;
 	end
@@ -79,12 +79,12 @@ function FRC_CraftFrame_SetSelection(id)
 		CraftReagentLabel:SetText(SPELL_REAGENTS.." "..costText);
 		CraftReagentLabel:Show();
 	end
-	
+
 end
 
 function FRC_TradeSkillFrame_SetSelection(id)
 	FRC_Orig_TradeSkillFrame_SetSelection(id);
-	
+
 	if ( not id ) then
 		return;
 	end
@@ -93,14 +93,14 @@ function FRC_TradeSkillFrame_SetSelection(id)
 		return;
 	end
 	local skillLineName, skillLineRank, skillLineMaxRank = GetTradeSkillLine();
-	
+
 	local costText;
 	if (FRC_Config.Enabled) then
 		local link = GetTradeSkillItemLink(id);
 		if (link == nil) then return; end
 		local _, _, itemID = string.find(link, "item:(%d+)");
 		itemID = tonumber(itemID);
-		
+
 		local materialsTotal, confidenceScore = FRC_MaterialsCost(skillLineName, itemID);
 		costText = GFWUtils.LtY("(Total cost: ");
 		if (materialsTotal == nil) then
@@ -117,25 +117,25 @@ function FRC_TradeSkillFrame_SetSelection(id)
 		TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." "..costText);
 		TradeSkillReagentLabel:Show();
 	end
-	
+
 end
 
 function FRC_TradeSkillFrame_Update()
 	FRC_Orig_TradeSkillFrame_Update();
-	
+
 	FRC_ScanTradeSkill();
 end
 
 function FRC_CraftFrame_Update()
 	FRC_Orig_CraftFrame_Update();
-	
+
 	FRC_ScanCraft();
 end
 
 function FRC_OnLoad()
-	
+
 	FRC_GetPriceSource();
-	
+
 	-- Register Slash Commands
 	SLASH_FRC1 = "/reagentcost";
 	SLASH_FRC2 = "/rc";
@@ -149,7 +149,7 @@ function FRC_OnLoad()
 	this:RegisterEvent("TRADE_SKILL_UPDATE");
 	this:RegisterEvent("ADDON_LOADED");
 	this:RegisterEvent("VARIABLES_LOADED");
-	
+
 end
 
 function FRC_OnUpdate(elapsed)
@@ -173,7 +173,7 @@ function FRC_OnUpdate(elapsed)
 			FRC_CraftLock.Locked = false;
 		end
 	end
-	
+
 	if (FRC_TradeSkillLock.NeedScan) then
 		FRC_TradeSkillLock.NeedScan = false;
 		FRC_ScanTradeSkill();
@@ -185,7 +185,7 @@ function FRC_OnUpdate(elapsed)
 end
 
 function FRC_OnEvent(event)
-	
+
 	if (event == "ADDON_LOADED" and (arg1 == "Blizzard_CraftUI" or IsAddOnLoaded("Blizzard_CraftUI"))) then
 		if (FRC_Orig_CraftFrame_SetSelection == nil) then
 			-- Overrides for displaying info in CraftFrame
@@ -209,7 +209,7 @@ function FRC_OnEvent(event)
 			-- And for scanning, since it looks like doing it in event handlers is crashy/unreliable now.
 			FRC_Orig_TradeSkillFrame_Update = TradeSkillFrame_Update;
 			TradeSkillFrame_Update = FRC_TradeSkillFrame_Update;
-		
+
 			--GFWUtils.Print("ReagentCost TradeSkillFrame hooks installed.");
 		end
 	end
@@ -224,15 +224,15 @@ function FRC_OnEvent(event)
 		FRC_GetPriceSource();
 		return;
 	end
-	
+
 	if ( event == "TRADE_SKILL_SHOW" or event == "CRAFT_SHOW" and FRC_Config.Enabled) then
-	
+
 		if (event == "CRAFT_SHOW" and GetCraftDisplaySkillLine() == nil) then
 			-- Beast Training uses the CraftFrame; we can tell when it's up because it doesn't have a skill-level bar.
 			-- We don't have anything to do in that case, so let's not try loading Auctioneer and stuff.
-			return;		
+			return;
 		end
-		
+
 		FRC_GetPriceSource();
 		if ( FRC_PriceSource == nil) then
 			GFWUtils.Print("ReagentCost: missing required dependency. Can't find a compatible auction pricing addon.");
@@ -244,11 +244,11 @@ function FRC_OnEvent(event)
 	if ( event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_UPDATE" ) then
 
 		FRC_ScanTradeSkill();
-		
+
 	elseif ( event == "CRAFT_SHOW" or event == "CRAFT_UPDATE" ) then
-	
+
 		FRC_ScanCraft();
-		
+
 	end
 
 end
@@ -283,7 +283,7 @@ function FRC_ChatCommandHandler(msg)
 		GFWUtils.Print("Fizzwidget Reagent Cost "..version);
 		return;
 	end
-		
+
 	-- Check Status
 	if ( msg == "status" ) then
 		if (FRC_Config.Enabled) then
@@ -313,14 +313,14 @@ function FRC_ChatCommandHandler(msg)
 		FRC_ChatCommandHandler("status");
 		return;
 	end
-	
+
 	-- Turn trade info gathering on
 	if ( msg == "on" ) then
 		FRC_Config.Enabled = true;
 		GFWUtils.Print("Reagent Cost "..GFWUtils.Hilite("is").." displaying materials cost in tradeskill windows.");
 		return;
 	end
-	
+
 	-- Turn trade info gathering Off
 	if ( msg == "off" ) then
 		FRC_Config.Enabled = false;
@@ -360,9 +360,9 @@ function FRC_ChatCommandHandler(msg)
 	end
 
 	if ( cmd == "reagents" or cmd == "report" ) then
-		
+
 		FRC_LoadPriceSourceIfNeeded(true);
-		
+
 		-- check second arg
 		local _, _, arg1, moreArgs = string.find(args, "(%w+) *(.*)");
 		local scope = "toon";
@@ -373,7 +373,7 @@ function FRC_ChatCommandHandler(msg)
 			scope = "all";
 			args = moreArgs;
 		end
-		
+
 		-- parse skill names from args
 		local mySkills = { };
 		if (args and args ~= "") then
@@ -382,7 +382,7 @@ function FRC_ChatCommandHandler(msg)
 				table.insert(mySkills, niceWord);
 			end
 		end
-		
+
 		-- if no args, use the skills this character knows
 		if (table.getn(mySkills) == 0) then
 			for skillIndex = 1, GetNumSkillLines() do
@@ -392,7 +392,7 @@ function FRC_ChatCommandHandler(msg)
 				end
 			end
 		end
-		
+
 		local printList;
 		if (cmd == "report") then
 			printList = FRC_ReportForSkill;
@@ -402,22 +402,22 @@ function FRC_ChatCommandHandler(msg)
 		for _, skillName in pairs(mySkills) do
 			printList(skillName, scope);
 		end
-		
+
 		return;
 	end
-	
+
 	local linksFound;
 	FRC_LoadPriceSourceIfNeeded(true);
 	for itemLink in string.gmatch(msg, "(|c%x+|Hitem:[-%d:]+|h%[.-%]|h|r)") do
 		linksFound = true;
 		local _, _, itemID = string.find(itemLink, "item:([-%d]+)");
 		itemID = tonumber(itemID);
-		
+
 		local found = false;
 		for skillName, skillTable in pairs(FRC_ReagentLinks) do
 			if (skillTable[itemID]) then
 				for recipe, reagentList in pairs(skillTable[itemID]) do
-					
+
 					-- differentiate cases where an item can be made by multiple recipes
 					-- by checking to see if the name of the recipe matches the name of the item
 					if (string.find(itemLink, "%["..recipe.."%]")) then
@@ -428,7 +428,7 @@ function FRC_ChatCommandHandler(msg)
 					found = true;
 					for _, reagentInfo in pairs(reagentList) do
 						if (type(reagentInfo) == "table") then
-							local price, confidence, isAdjusted = FRC_GetAdjustedCost(skillName, reagentInfo.id);						
+							local price, confidence, isAdjusted = FRC_GetAdjustedCost(skillName, reagentInfo.id);
 							local adjustedText, confidenceText;
 							if (isAdjusted) then
 								adjustedText = "(based on component prices)";
@@ -451,7 +451,7 @@ function FRC_ChatCommandHandler(msg)
 							end
 						end
 					end
-			
+
 					local itemPrice, itemConfidence = FRC_TypicalItemPrice(itemID);
 					local materialsCost, matsConfidence = FRC_MaterialsCostForRecipe(skillName, itemID, recipe);
 					local profit = itemPrice - materialsCost;
@@ -480,7 +480,7 @@ function FRC_ChatCommandHandler(msg)
 			GFWUtils.Print(itemLink.." not found in tradeskill data.");
 		end
 	end
-	
+
 	-- If we get down to here, we got bad input.
 	if (not linksFound) then
 		FRC_ChatCommandHandler("help");
@@ -523,12 +523,12 @@ function FRC_ListAllReagents(skillName, scope)
 									break;
 								end
 							end
-						end				
+						end
 					end
 				else
 					known = true;
-				end				
-		
+				end
+
 				if (known) then
 					local itemString;
 					if (type(anItem) == "number") then
@@ -552,7 +552,7 @@ function FRC_ReportForSkill(skillName, scope)
 	local reliableItems = 0;
 	local shownItems = 0;
 	local itemsTable = FRC_ReagentLinks[skillName];
-	
+
 	if (itemsTable == nil) then
 		if (ReagentData == nil) then
 			GFWUtils.Print("Nothing for "..GFWUtils.Hilite(skillName)..".");
@@ -569,7 +569,7 @@ function FRC_ReportForSkill(skillName, scope)
 		end
 		return;
 	end
-	
+
 	local reportTable = { }; -- separate report for each skill
 
 	-- first, build a table that includes current Auctioneer prices for composite items
@@ -595,11 +595,11 @@ function FRC_ReportForSkill(skillName, scope)
 							break;
 						end
 					end
-				end				
+				end
 			end
 		else
 			known = true;
-		end				
+		end
 
 		if (known and type(anItem) == "number") then
 			-- it's an item, not an enchant (which isn't auctionable, and thus doesn't have a price to compare)
@@ -608,10 +608,10 @@ function FRC_ReportForSkill(skillName, scope)
 				knownItems = knownItems + 1;
 				local itemPrice, itemConfidence = FRC_TypicalItemPrice(itemID);
 				local materialsCost, matsConfidence = FRC_MaterialsCostForRecipe(skillName, itemID, recipe);
-	
+
 				if (itemConfidence == nil) then itemConfidence = 0; end
 				if (matsConfidence == nil) then matsConfidence = 0; end
-	
+
 				if (itemConfidence >= MIN_CONFIDENCE and matsConfidence >= MIN_CONFIDENCE) then
 					reliableItems = reliableItems + 1;
 					local profit = itemPrice - materialsCost;
@@ -621,24 +621,24 @@ function FRC_ReportForSkill(skillName, scope)
 			end
 		end
 	end
-	
 
-	if (knownItems == 0) then 
+
+	if (knownItems == 0) then
 		GFWUtils.Print("ReagentCost doesn't know of any items you can make with "..GFWUtils.Hilite(skillName)..". Please open your "..GFWUtils.Hilite(skillName).." window before requesting a report.");
 		return;
 	end
-	
-	if (reliableItems == 0) then 
+
+	if (reliableItems == 0) then
 		GFWUtils.Print("None of the "..GFWUtils.Hilite(knownItems).." items you can make with "..GFWUtils.Hilite(skillName).." have reliable auction price data. (They may not be tradeable.)");
 		return;
 	end
-	
+
 	GFWUtils.Print("Most profitable recipes for "..GFWUtils.Hilite(skillName)..":");
 
 	if (reliableItems > 1) then
 		table.sort(reportTable, FRC_SortProfit);
 	end
-	
+
 	-- and report those that meet our minimum requirements
 	for _, reportInfo in pairs(reportTable) do
 		if (FRC_Config.MinProfitRatio and (reportInfo.profit / reportInfo.matsCost * 100) >= FRC_Config.MinProfitRatio) then
@@ -689,10 +689,10 @@ function FRC_ScanTradeSkill()
 	if (FRC_ItemInfoCache == nil) then
 		FRC_ItemInfoCache = {};
 	end
-	for id = GetNumTradeSkills(), 1, -1 do 
+	for id = GetNumTradeSkills(), 1, -1 do
 		-- loop from the bottom up, since the reagents we make for compound items are usually below the recipes that need them
 		local skillName, skillType, numAvailable, isExpanded = GetTradeSkillInfo(id);
-		if ( skillType ~= "header" ) then				
+		if ( skillType ~= "header" ) then
 			local itemLink = GetTradeSkillItemLink(id);
 			if (itemLink == nil) then
 				FRC_TradeSkillLock.NeedScan = true;
@@ -702,7 +702,7 @@ function FRC_ScanTradeSkill()
 					FRC_TradeSkillLock.NeedScan = true;
 					break;
 				end
-				
+
 				local reagentInfo = {};
 				for i=1, numReagents do
 					local link = GetTradeSkillReagentItemLink(id, i);
@@ -713,7 +713,7 @@ function FRC_ScanTradeSkill()
 						local _, _, reagentID = string.find(link, "item:(%d+)");
 						reagentID = tonumber(reagentID);
 						FRC_AddItemInfo(reagentID);
-												
+
 						local reagentName, reagentTexture, reagentCount, playerReagentCount = GetTradeSkillReagentInfo(id, i);
 						table.insert(reagentInfo, {id=reagentID, count=reagentCount});
 					end
@@ -775,7 +775,7 @@ function FRC_ScanCraft()
 					FRC_CraftLock.NeedScan = true;
 					break;
 				end
-									
+
 				local reagentInfo = {};
 				for i=1, numReagents do
 					local link = GetCraftReagentItemLink(id, i);
@@ -786,7 +786,7 @@ function FRC_ScanCraft()
 						local _, _, reagentID = string.find(link, "item:(%d+)");
 						reagentID = tonumber(reagentID);
 						FRC_AddItemInfo(reagentID);
-						
+
 						local reagentName, reagentTexture, reagentCount, playerReagentCount = GetCraftReagentInfo(id, i);
 						table.insert(reagentInfo, {id=reagentID, count=reagentCount});
 					end
@@ -803,7 +803,7 @@ function FRC_AddReagentInfo(tradeskill, recipe, link, reagentInfo)
 	local realm = GetRealmName();
 	local player = UnitName("player");
 	local identifier;
-	
+
 	local _, _, itemID = string.find(link, "item:(%d+)");
 	local _, _, enchantLink = string.find(link, "(enchant:%d+)");
 	if (itemID) then
@@ -876,7 +876,7 @@ function FRC_AdjustedCost(skillName, itemID)
 	else
 		FRC_RecursiveItems[itemID] = 1;
 	end
-	
+
 	-- don't calculate sub-reagent prices for the likes of alchemical transumutes
 	-- (recipes that take one reagent also produced by the same skill and produce one other such reagent)
 	if (FRC_ReagentLinks[skillName] and FRC_ReagentLinks[skillName][itemID]) then
@@ -890,9 +890,9 @@ function FRC_AdjustedCost(skillName, itemID)
 			end
 		end
 	end
-	
+
 	-- for all other recipes, calculate total cost of reagents which might be produced by the same skill,
-	-- and use that amount if it's more reliable. 
+	-- and use that amount if it's more reliable.
 	-- (e.g. engineering parts -> base reagents, bolts of cloth -> pieces of cloth)
 	local subReagentsPrice, subReagentsConfidence = FRC_MaterialsCost(skillName, itemID);
 	if (subReagentsPrice and subReagentsConfidence) then
@@ -926,7 +926,7 @@ function FRC_MaterialsCost(skillName, itemID)
 	if (table.getn(pricesPerRecipe) == 0) then
 		return nil, nil;
 	end
-	
+
 	local sortCost = function(a,b)
 		return a.cost < b.cost;
 	end
@@ -935,16 +935,16 @@ function FRC_MaterialsCost(skillName, itemID)
 	end
 	table.sort(pricesPerRecipe, sortConfidence);
 	table.sort(pricesPerRecipe, sortCost);
-	
+
 	return pricesPerRecipe[1].cost, pricesPerRecipe[1].confidence;
-	
+
 end
 
 function FRC_MaterialsCostForRecipe(skillName, itemID, recipeName)
 	local materialsTotal = 0;
 	local totalConfidence = 0;
 	local numAuctionReagents = 0;
-		
+
 	if (FRC_ReagentLinks[skillName] == nil) then
 		return nil, nil;
 	end
@@ -954,7 +954,7 @@ function FRC_MaterialsCostForRecipe(skillName, itemID, recipeName)
 	if (FRC_ReagentLinks[skillName][itemID][recipeName] == nil) then
 		return nil, nil;
 	end
-	
+
 	for _, reagentInfo in pairs(FRC_ReagentLinks[skillName][itemID][recipeName]) do
 		local price, confidence = FRC_AdjustedCost(skillName, reagentInfo.id);
 		if (price == nil) then
@@ -964,10 +964,10 @@ function FRC_MaterialsCostForRecipe(skillName, itemID, recipeName)
 		if (confidence >= 0) then
 			totalConfidence = totalConfidence + confidence;
 			numAuctionReagents = numAuctionReagents + 1;
-		end		
+		end
 	end
 	local confidenceScore = math.floor(totalConfidence / numAuctionReagents);
-	
+
 	return materialsTotal, confidenceScore;
 
 end
@@ -976,39 +976,39 @@ function FRC_TypicalItemPrice(itemID)
 	if (itemID == nil) then
 		return nil;
 	end
-	
+
 	-- we keep our own price data on tradeskill ingredients bought from vendors
 	-- (e.g. thread, flux, dye, vials)
 	if (FRC_VendorPrices[itemID]) then
 		return FRC_VendorPrices[itemID].b, -1;
 	end
-	
+
 	if (not FRC_LoadPriceSourceIfNeeded(true)) then return nil; end
-	
+
 	local priceFunction = FRC_PriceFunctions[FRC_PriceSource];
 	if (priceFunction) then
 		return priceFunction(itemID);
 	else
 		error("ReagentCost: price function for "..FRC_PriceSource.." missing.",2);
-		return nil; 
+		return nil;
 	end
 end
 
 function FRC_AucAdvancedItemPrice(itemID)
-	
+
 	if not (AucAdvanced and AucAdvanced.API and AucAdvanced.API.GetMarketValue) then
 		GFWUtils.PrintOnce(GFWUtils.Red("ReagentCost error:").." missing expected Auctioneer API; can't calculate item prices.", 5);
 		return nil, nil;
 	end
-	
+
 	local value, count = AucAdvanced.API.GetMarketValue(itemID);
 	local sellToVendorPrice;
 	if (GetSellValue) then
 	 	sellToVendorPrice = GetSellValue(itemID);
 	end
-	
+
 	if (value) then
-		return value, math.floor(math.min(count, MIN_SCANS) / MIN_SCANS * 100); 
+		return value, math.floor(math.min(count, MIN_SCANS) / MIN_SCANS * 100);
 	elseif (sellToVendorPrice) then
 		return sellToVendorPrice * 3, 0;	-- generally a good guess for auction price if we don't have real auction data
 	else
@@ -1029,14 +1029,14 @@ function FRC_AuctioneerItemPrice(itemID)
 		GFWUtils.PrintOnce(GFWUtils.Red("ReagentCost error:").." missing expected Auctioneer API; can't calculate item prices.", 5);
 		return nil, nil;
 	end
-	
+
 	local itemKey = itemID..":0:0";
 	local medianPrice, medianCount = getUsableMedian(itemKey);
 	if (medianPrice == nil) then
 		medianPrice, medianCount = getHistoricalMedian(itemKey);
 	end
 	if (medianCount == nil) then medianCount = 0 end
-			
+
 	if (medianCount == 0 or medianPrice == nil) then
 		local sellToVendorPrice = 0;
 		if (getVendorSellPrice) then
@@ -1047,7 +1047,7 @@ function FRC_AuctioneerItemPrice(itemID)
 		end
 		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
 	else
-		return medianPrice, math.floor(math.min(medianCount, MIN_SCANS) / MIN_SCANS * 100); 
+		return medianPrice, math.floor(math.min(medianCount, MIN_SCANS) / MIN_SCANS * 100);
 	end
 end
 
@@ -1057,7 +1057,7 @@ function FRC_KCItemPrice(itemLink)
 	local seen, avgstack, min, bidseen, bid, buyseen, buy = KC_Auction:GetItemData(itemCode);
 	local _, _, itemID  = string.find(itemLink, ".Hitem:(%d+):%d+:%d+:%d+.h%[[^]]+%].h");
 	itemID = tonumber(itemID) or 0;
-	
+
 	local buyFromVendorPrice = 0;
 	local sellToVendorPrice = 0;
 	if (FRC_VendorPrices[itemID]) then
@@ -1067,7 +1067,7 @@ function FRC_KCItemPrice(itemLink)
 	if (sellToVendorPrice == 0 and KC_SellValue) then
 		sellToVendorPrice = (KC_Common:GetItemPrices(itemCode) or 0);
 	end
-	
+
 	--DevTools_Dump({itemLink=itemLink, itemID=itemID, buy=buy, buyseen=buyseen, buyFromVendorPrice=buyFromVendorPrice, sellToVendorPrice=sellToVendorPrice});
 
 	if (buyFromVendorPrice and buyFromVendorPrice > 0) then
@@ -1092,7 +1092,7 @@ function FRC_AuctionMatrixItemPrice(itemLink)
 		buyFromVendorPrice = FRC_VendorPrices[itemID].b;
 		sellToVendorPrice = FRC_VendorPrices[itemID].s;
 	end
-		
+
 	local buyout, times, storeStack;
 	if (itemName and itemName ~= "" and AMDB[itemName]) then
 		buyout = tonumber(AM_GetMedian(itemName, "abuyout"));
@@ -1107,7 +1107,7 @@ function FRC_AuctionMatrixItemPrice(itemLink)
 	end
 
 	--DevTools_Dump({itemLink=itemLink, buyout=buyout, times=times, buyFromVendorPrice=buyFromVendorPrice, sellToVendorPrice=sellToVendorPrice});
-		
+
 	if (buyFromVendorPrice and buyFromVendorPrice > 0) then
 		return buyFromVendorPrice, -1; -- FRC_VendorPrices lists only the primarily-vendor-bought tradeskill items
 	elseif (buyout and times and buyout > 0) then
@@ -1119,7 +1119,7 @@ function FRC_AuctionMatrixItemPrice(itemLink)
 	elseif (sellToVendorPrice and sellToVendorPrice > 0) then
 		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
 	end
-	
+
 	GFWUtils.DebugLog(itemLink.." not found in AuctionMatrix or vendor-reagent prices list");
 	return nil, 0;
 end
@@ -1130,23 +1130,23 @@ function FRC_WOWEcon_PriceModItemPrice(itemLink)
     if (medianCount == nil) then
 		medianCount = 0;
 	end
-        
+
 	local _, _, itemID  = string.find(itemLink, ".Hitem:(%d+):%d+:%d+:%d+.h%[[^]]+%].h");
 	itemID = tonumber(itemID) or 0;
-			
+
 	local buyFromVendorPrice = 0;
 	local sellToVendorPrice = 0;
 	if (FRC_VendorPrices[itemID]) then
 		buyFromVendorPrice = FRC_VendorPrices[itemID].b;
 		sellToVendorPrice = FRC_VendorPrices[itemID].s;
 	end
-			
+
 	if (sellToVendorPrice == 0) then
 		sellToVendorPrice = WOWEcon_GetVendorPrice_ByLink(itemLink);
 	end
-			
+
 	if (sellToVendorPrice == nil) then sellToVendorPrice = 0 end
-			
+
 	if (buyFromVendorPrice > 0) then
 		return buyFromVendorPrice, -1; -- FRC_VendorPrices lists only the primarily-vendor-bought tradeskill items
 	elseif (medianCount == 0 or medianPrice == nil) then
@@ -1172,11 +1172,11 @@ function FRC_GetItemLink(itemID)
 	if (string.find(link, "|c%x+|Hitem:[-%d:]+|h%[.-%]|h|r")) then
 		return link;
 	elseif (isCached) then
-		local _, _, _, color = GetItemQualityColor(quality);	
+		local _, _, _, color = GetItemQualityColor(quality);
 		local linkFormat = "%s|H%s|h[%s]|h|r";
 		return string.format(linkFormat, color, link, name);
 	else
-		local _, _, _, color = GetItemQualityColor(quality);	
+		local _, _, _, color = GetItemQualityColor(quality);
 		return color..name..FONT_COLOR_CODE_CLOSE;
 	end
 end
@@ -1191,7 +1191,7 @@ FRC_PriceFunctions = {
 
 function FRC_GetPriceSource()
 	if (not FRC_PriceSource) then
-		for addon in pairs(FRC_PriceFunctions) do 
+		for addon in pairs(FRC_PriceFunctions) do
 			local name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(addon);
 			if (loadable or IsAddOnLoaded(addon)) then
 				FRC_PriceSource = addon;
