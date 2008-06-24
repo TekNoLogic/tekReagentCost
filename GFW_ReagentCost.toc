@@ -7,7 +7,5 @@
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Crafting: true
 
-GFWUtils.lua
-GFWTable.lua
 ReagentCost_VendorPrices.lua
 ReagentCost.lua
