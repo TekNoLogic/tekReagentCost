@@ -987,8 +987,8 @@ function FRC_TypicalItemPrice(itemID)
 
 	-- we keep our own price data on tradeskill ingredients bought from vendors
 	-- (e.g. thread, flux, dye, vials)
-	if (FRC_VendorPrices[itemID]) then
-		return FRC_VendorPrices[itemID].b, -1;
+	if (FRC_VendorBuyPrices[itemID]) then
+		return FRC_VendorBuyPrices[itemID], -1
 	end
 
 	if (not FRC_LoadPriceSourceIfNeeded(true)) then return nil; end
@@ -1050,8 +1050,8 @@ function FRC_AuctioneerItemPrice(itemID)
 		if (getVendorSellPrice) then
 			sellToVendorPrice = getVendorSellPrice(itemID) or 0;
 		end
-		if (sellToVendorPrice == 0 and FRC_VendorPrices[itemID]) then
-			sellToVendorPrice = FRC_VendorPrices[itemID].s;
+		if (sellToVendorPrice == 0 and FRC_VendorSellPrices[itemID]) then
+			sellToVendorPrice = FRC_VendorSellPrices[itemID];
 		end
 		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
 	else
@@ -1068,9 +1068,9 @@ function FRC_KCItemPrice(itemLink)
 
 	local buyFromVendorPrice = 0;
 	local sellToVendorPrice = 0;
-	if (FRC_VendorPrices[itemID]) then
-		buyFromVendorPrice = FRC_VendorPrices[itemID].b;
-		sellToVendorPrice = FRC_VendorPrices[itemID].s;
+	if FRC_VendorBuyPrices[itemID] then
+		buyFromVendorPrice = FRC_VendorBuyPrices[itemID]
+		sellToVendorPrice = FRC_VendorSellPrices[itemID]
 	end
 	if (sellToVendorPrice == 0 and KC_SellValue) then
 		sellToVendorPrice = (KC_Common:GetItemPrices(itemCode) or 0);
@@ -1096,9 +1096,9 @@ function FRC_AuctionMatrixItemPrice(itemLink)
 	local buyFromVendorPrice = 0;
 	local sellToVendorPrice = 0;
 	itemID = tonumber(itemID) or 0;
-	if (FRC_VendorPrices[itemID]) then
-		buyFromVendorPrice = FRC_VendorPrices[itemID].b;
-		sellToVendorPrice = FRC_VendorPrices[itemID].s;
+	if FRC_VendorBuyPrices[itemID] then
+		buyFromVendorPrice = FRC_VendorBuyPrices[itemID]
+		sellToVendorPrice = FRC_VendorSellPrices[itemID]
 	end
 
 	local buyout, times, storeStack;
@@ -1144,9 +1144,9 @@ function FRC_WOWEcon_PriceModItemPrice(itemLink)
 
 	local buyFromVendorPrice = 0;
 	local sellToVendorPrice = 0;
-	if (FRC_VendorPrices[itemID]) then
-		buyFromVendorPrice = FRC_VendorPrices[itemID].b;
-		sellToVendorPrice = FRC_VendorPrices[itemID].s;
+	if FRC_VendorBuyPrices[itemID] then
+		buyFromVendorPrice = FRC_VendorBuyPrices[itemID]
+		sellToVendorPrice = FRC_VendorSellPrices[itemID]
 	end
 
 	if (sellToVendorPrice == 0) then
