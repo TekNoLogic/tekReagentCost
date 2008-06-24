@@ -1,0 +1,11 @@
+## Interface: 20100
+## Version: 2.1.2
+## Title: Fizzwidget Reagent Cost
+## Author: Gazmik Fizzwidget
+## Notes: Calculates and displays total materials cost for items in the tradeskill window.
+## SavedVariables: FRC_Config, FRC_ReagentLinks, FRC_KnownRecipes, FRC_ItemInfoCache
+## LoadManagers: AddonLoader
+## X-LoadOn-Crafting: true
+## X-LoadOn-Slash: /reagentcost, /rc
+
+ReagentCost.xml
