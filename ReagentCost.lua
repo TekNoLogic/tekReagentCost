@@ -74,11 +74,7 @@ function FRC_CraftFrame_SetSelection(id)
 		local materialsTotal, confidenceScore = FRC_MaterialsCost(name, identifier);
 		costText = GFWUtils.LtY("(Total cost: ");
 		if (materialsTotal == nil) then
-			if (FRC_PriceSource and not IsAddOnLoaded(FRC_PriceSource)) then
-				costText = costText .. GFWUtils.Gray("["..FRC_PriceSource.." not loaded]");
-			else
-				costText = costText .. GFWUtils.Gray("Unknown [insufficient data]");
-			end
+			costText = costText .. GFWUtils.Gray("Unknown [insufficient data]");
 		else
 			costText = costText .. GFWUtils.TextGSC(materialsTotal) ..GFWUtils.Gray(" Confidence: "..confidenceScore.."%");
 		end
@@ -112,11 +108,7 @@ function FRC_TradeSkillFrame_SetSelection(id)
 		local materialsTotal, confidenceScore = FRC_MaterialsCost(skillLineName, itemID);
 		costText = GFWUtils.LtY("(Total cost: ");
 		if (materialsTotal == nil) then
-			if (FRC_PriceSource and not IsAddOnLoaded(FRC_PriceSource)) then
-				costText = costText .. GFWUtils.Gray("["..FRC_PriceSource.." not loaded]");
-			else
-				costText = costText .. GFWUtils.Gray("Unknown [insufficient data]");
-			end
+			costText = costText .. GFWUtils.Gray("Unknown [insufficient data]");
 		else
 			costText = costText .. GFWUtils.TextGSC(materialsTotal) ..GFWUtils.Gray(" Confidence: "..confidenceScore.."%");
 		end
@@ -141,8 +133,6 @@ function FRC_CraftFrame_Update()
 end
 
 function FRC_OnLoad()
-
-	FRC_GetPriceSource();
 
 	-- Register Slash Commands
 	SLASH_FRC1 = "/reagentcost";
@@ -229,7 +219,6 @@ function FRC_OnEvent(event)
 			FRC_Config.Enabled = true;
 			FRC_Config.MinProfitRatio = 0;
 		end
-		FRC_GetPriceSource();
 		return;
 	end
 
@@ -240,13 +229,6 @@ function FRC_OnEvent(event)
 			-- We don't have anything to do in that case, so let's not try loading Auctioneer and stuff.
 			return;
 		end
-
-		FRC_GetPriceSource();
-		if ( FRC_PriceSource == nil) then
-			GFWUtils.Print("ReagentCost: missing required dependency. Can't find a compatible auction pricing addon.");
-			return;
-		end
-		FRC_LoadPriceSourceIfNeeded();
 	end
 
 	if ( event == "TRADE_SKILL_SHOW" or event == "TRADE_SKILL_UPDATE" ) then
@@ -263,11 +245,6 @@ end
 
 function FRC_ChatCommandHandler(msg)
 
-	if (FRC_PriceSource == nil) then
-		GFWUtils.Print("ReagentCost is installed but non-functional; can't find a compatible auction pricing addon.");
-		return;
-	end
-
 	-- Print Help
 	if ( msg == "help" ) or ( msg == "" ) then
 		local version = GetAddOnMetadata("GFW_ReagentCost", "Version");
@@ -277,9 +254,6 @@ function FRC_ChatCommandHandler(msg)
 		GFWUtils.Print("- "..GFWUtils.Hilite("status").." - Check current settings.");
 		GFWUtils.Print("- "..GFWUtils.Hilite("reset").." - Reset to default settings.");
 		GFWUtils.Print("- "..GFWUtils.Hilite("on").." | "..GFWUtils.Hilite("off").." - Toggle displaying info in tradeskill windows.");
-		if (FRC_PriceSourceIsLoadOnDemand) then
-			GFWUtils.Print("- "..GFWUtils.Hilite("autoload on").." | "..GFWUtils.Hilite("off").." - Control whether to automatically load "..FRC_PriceSource.." when showing tradeskill windows.");
-		end
 		GFWUtils.Print("- "..GFWUtils.Hilite("report [<skillname>]").." - Output a list of the most profitable tradeskill items you can make. (Or only those produced through <skillname>.)");
 		GFWUtils.Print("- "..GFWUtils.Hilite("minprofit <number>").." - When reporting, only show items whose estimated profit is <number> or greater. (In copper, so 1g == 10000.)");
 		GFWUtils.Print("- "..GFWUtils.Hilite("minprofit <number>%").." - When reporting, only show items whose estimated profit exceeds its cost of materials by <number> percent or more.");
@@ -369,8 +343,6 @@ function FRC_ChatCommandHandler(msg)
 
 	if ( cmd == "reagents" or cmd == "report" ) then
 
-		FRC_LoadPriceSourceIfNeeded(true);
-
 		-- check second arg
 		local _, _, arg1, moreArgs = string.find(args, "(%w+) *(.*)");
 		local scope = "toon";
@@ -415,7 +387,6 @@ function FRC_ChatCommandHandler(msg)
 	end
 
 	local linksFound;
-	FRC_LoadPriceSourceIfNeeded(true);
 	for itemLink in string.gmatch(msg, "(|c%x+|Hitem:[-%d:]+|h%[.-%]|h|r)") do
 		linksFound = true;
 		local _, _, itemID = string.find(itemLink, "item:([-%d]+)");
@@ -981,187 +952,9 @@ function FRC_MaterialsCostForRecipe(skillName, itemID, recipeName)
 end
 
 function FRC_TypicalItemPrice(itemID)
-	if (itemID == nil) then
-		return nil;
-	end
-
-	-- we keep our own price data on tradeskill ingredients bought from vendors
-	-- (e.g. thread, flux, dye, vials)
-	if (FRC_VendorBuyPrices[itemID]) then
-		return FRC_VendorBuyPrices[itemID], -1
-	end
-
-	if (not FRC_LoadPriceSourceIfNeeded(true)) then return nil; end
-
-	local priceFunction = FRC_PriceFunctions[FRC_PriceSource];
-	if (priceFunction) then
-		return priceFunction(itemID);
-	else
-		error("ReagentCost: price function for "..FRC_PriceSource.." missing.",2);
-		return nil;
-	end
-end
-
-function FRC_AucAdvancedItemPrice(itemID)
-
-	if not (AucAdvanced and AucAdvanced.API and AucAdvanced.API.GetMarketValue) then
-		GFWUtils.PrintOnce(GFWUtils.Red("ReagentCost error:").." missing expected Auctioneer API; can't calculate item prices.", 5);
-		return nil, nil;
-	end
-
-	local value, count = AucAdvanced.API.GetMarketValue(itemID);
-	local sellToVendorPrice;
-	if (GetSellValue) then
-	 	sellToVendorPrice = GetSellValue(itemID);
-	end
-
-	if (value) then
-		return value, math.floor(math.min(count, MIN_SCANS) / MIN_SCANS * 100);
-	elseif (sellToVendorPrice) then
-		return sellToVendorPrice * 3, 0;	-- generally a good guess for auction price if we don't have real auction data
-	else
-		return nil, 0;
-	end
-end
-
-function FRC_AuctioneerItemPrice(itemID)
-	local getUsableMedian, getHistoricalMedian, getVendorSellPrice, getVendorBuyPrice;
-	if (Auctioneer and Auctioneer.Statistic) then
-		getUsableMedian = Auctioneer.Statistic.GetUsableMedian;
-		getHistoricalMedian = Auctioneer.Statistic.GetItemHistoricalMedianBuyout;
-	end
-	if (Auctioneer and Auctioneer.API) then
-		getVendorSellPrice = Auctioneer.API.GetVendorSellPrice;
-	end
-	if (not (getUsableMedian and getHistoricalMedian)) then
-		GFWUtils.PrintOnce(GFWUtils.Red("ReagentCost error:").." missing expected Auctioneer API; can't calculate item prices.", 5);
-		return nil, nil;
-	end
-
-	local itemKey = itemID..":0:0";
-	local medianPrice, medianCount = getUsableMedian(itemKey);
-	if (medianPrice == nil) then
-		medianPrice, medianCount = getHistoricalMedian(itemKey);
-	end
-	if (medianCount == nil) then medianCount = 0 end
-
-	if (medianCount == 0 or medianPrice == nil) then
-		local sellToVendorPrice = 0;
-		if (getVendorSellPrice) then
-			sellToVendorPrice = getVendorSellPrice(itemID) or 0;
-		end
-		if (sellToVendorPrice == 0 and FRC_VendorSellPrices[itemID]) then
-			sellToVendorPrice = FRC_VendorSellPrices[itemID];
-		end
-		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
-	else
-		return medianPrice, math.floor(math.min(medianCount, MIN_SCANS) / MIN_SCANS * 100);
-	end
-end
-
--- TODO: update KC_Items import, check whether it can use just itemID
-function FRC_KCItemPrice(itemLink)
-	local itemCode = KC_Common:GetCode(itemLink);
-	local seen, avgstack, min, bidseen, bid, buyseen, buy = KC_Auction:GetItemData(itemCode);
-	local _, _, itemID  = string.find(itemLink, ".Hitem:(%d+):%d+:%d+:%d+.h%[[^]]+%].h");
-	itemID = tonumber(itemID) or 0;
-
-	local buyFromVendorPrice = 0;
-	local sellToVendorPrice = 0;
-	if FRC_VendorBuyPrices[itemID] then
-		buyFromVendorPrice = FRC_VendorBuyPrices[itemID]
-		sellToVendorPrice = FRC_VendorSellPrices[itemID]
-	end
-	if (sellToVendorPrice == 0 and KC_SellValue) then
-		sellToVendorPrice = (KC_Common:GetItemPrices(itemCode) or 0);
-	end
-
-	--DevTools_Dump({itemLink=itemLink, itemID=itemID, buy=buy, buyseen=buyseen, buyFromVendorPrice=buyFromVendorPrice, sellToVendorPrice=sellToVendorPrice});
-
-	if (buyFromVendorPrice and buyFromVendorPrice > 0) then
-		return buyFromVendorPrice, -1; -- FRC_VendorPrices lists only the primarily-vendor-bought tradeskill items
-	elseif (buy and buy > 0) then
-		return buy, math.floor((math.min(buyseen, MIN_SCANS) / MIN_SCANS) * 1000) / 10;
-	elseif (sellToVendorPrice and sellToVendorPrice > 0) then
-		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
-	else
-		GFWUtils.DebugLog(itemLink.." not found in KC_Auction or vendor-reagent prices list");
-		return nil, 0;
-	end
-end
-
--- TODO: replace AuctionMatrix import with AuctionSync
-function FRC_AuctionMatrixItemPrice(itemLink)
-	local _, _, itemID, itemName  = string.find(itemLink, ".Hitem:(%d+):%d+:%d+:%d+.h%[([^]]+)%].h");
-	local buyFromVendorPrice = 0;
-	local sellToVendorPrice = 0;
-	itemID = tonumber(itemID) or 0;
-	if FRC_VendorBuyPrices[itemID] then
-		buyFromVendorPrice = FRC_VendorBuyPrices[itemID]
-		sellToVendorPrice = FRC_VendorSellPrices[itemID]
-	end
-
-	local buyout, times, storeStack;
-	if (itemName and itemName ~= "" and AMDB[itemName]) then
-		buyout = tonumber(AM_GetMedian(itemName, "abuyout"));
-		if (buyout == nil) then
-			buyout = tonumber(AuctionMatrix_GetData(itemName, "abuyout"));
-		end
-		times = tonumber(AuctionMatrix_GetData(itemName, "times"));
-		storeStack = tonumber(AuctionMatrix_GetData(itemName, "stack"));
-		if (sellToVendorPrice == 0) then
-			sellToVendorPrice = tonumber(AuctionMatrix_GetData(itemName, "vendor"));
-		end
-	end
-
-	--DevTools_Dump({itemLink=itemLink, buyout=buyout, times=times, buyFromVendorPrice=buyFromVendorPrice, sellToVendorPrice=sellToVendorPrice});
-
-	if (buyFromVendorPrice and buyFromVendorPrice > 0) then
-		return buyFromVendorPrice, -1; -- FRC_VendorPrices lists only the primarily-vendor-bought tradeskill items
-	elseif (buyout and times and buyout > 0) then
-		local buyoutForOne = buyout;
-		if (storeStack and storeStack > 0) then
-			buyoutForOne = math.floor(buyout/storeStack);
-		end
-		return buyoutForOne, math.floor((math.min(times, MIN_SCANS) / MIN_SCANS) * 1000) / 10;
-	elseif (sellToVendorPrice and sellToVendorPrice > 0) then
-		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
-	end
-
-	GFWUtils.DebugLog(itemLink.." not found in AuctionMatrix or vendor-reagent prices list");
-	return nil, 0;
-end
-
--- TODO: check whether WoWEcon can use just itemID
-function FRC_WOWEcon_PriceModItemPrice(itemLink)
-    local medianPrice, medianCount, serverData = WOWEcon_GetAuctionPrice_ByLink(itemLink);
-    if (medianCount == nil) then
-		medianCount = 0;
-	end
-
-	local _, _, itemID  = string.find(itemLink, ".Hitem:(%d+):%d+:%d+:%d+.h%[[^]]+%].h");
-	itemID = tonumber(itemID) or 0;
-
-	local buyFromVendorPrice = 0;
-	local sellToVendorPrice = 0;
-	if FRC_VendorBuyPrices[itemID] then
-		buyFromVendorPrice = FRC_VendorBuyPrices[itemID]
-		sellToVendorPrice = FRC_VendorSellPrices[itemID]
-	end
-
-	if (sellToVendorPrice == 0) then
-		sellToVendorPrice = WOWEcon_GetVendorPrice_ByLink(itemLink);
-	end
-
-	if (sellToVendorPrice == nil) then sellToVendorPrice = 0 end
-
-	if (buyFromVendorPrice > 0) then
-		return buyFromVendorPrice, -1; -- FRC_VendorPrices lists only the primarily-vendor-bought tradeskill items
-	elseif (medianCount == 0 or medianPrice == nil) then
-		return sellToVendorPrice * 3, 0; -- generally a good guess for auction price if we don't have real auction data
-	else
-		return medianPrice, math.floor((math.min(medianCount, MIN_SCANS) / MIN_SCANS) * 1000) / 10;
-	end
+	if not itemID then return end
+	if FRC_VendorBuyPrices[itemID] then return FRC_VendorBuyPrices[itemID], -1 end
+	if GetAuctionBuyout then return GetAuctionBuyout(itemID), 1 end
 end
 
 function FRC_GetItemInfo(itemID)
@@ -1186,42 +979,5 @@ function FRC_GetItemLink(itemID)
 	else
 		local _, _, _, color = GetItemQualityColor(quality);
 		return color..name..FONT_COLOR_CODE_CLOSE;
-	end
-end
-
-FRC_PriceFunctions = {
-	["auc-advanced"] = FRC_AucAdvancedItemPrice,
-	["Auctioneer"] = FRC_AuctioneerItemPrice,
---	["KC_Items"] = FRC_KCItemPrice,
---	["AuctionMatrix"] = FRC_AuctionMatrixItemPrice,
---	["WOWEcon_PriceMod"] = FRC_WOWEcon_PriceModItemPrice,
-};
-
-function FRC_GetPriceSource()
-	if (not FRC_PriceSource) then
-		for addon in pairs(FRC_PriceFunctions) do
-			local name, title, notes, enabled, loadable, reason, security = GetAddOnInfo(addon);
-			if (loadable or IsAddOnLoaded(addon)) then
-				FRC_PriceSource = addon;
-				break;
-			end
-		end
-	end
-end
-
-function FRC_LoadPriceSourceIfNeeded(needed)
-	if (needed or FRC_Config.AutoLoadPriceSource) then
-		if (FRC_PriceSource) then
-			if (not IsAddOnLoaded(FRC_PriceSource)) then
-				local loaded, reason = LoadAddOn(FRC_PriceSource);
-				if (not loaded) then
-					GFWUtils.Print(string.format("Can't load %s: %s", FRC_PriceSource, reason));
-					return false;
-				end
-			end
-			return true;
-		else
-			error("FRC_PriceSource == nil");
-		end
 	end
 end
