@@ -6,7 +6,6 @@
 ## SavedVariables: FRC_Config, FRC_ReagentLinks, FRC_KnownRecipes, FRC_ItemInfoCache
 ## LoadManagers: AddonLoader
 ## X-LoadOn-Crafting: true
-## X-LoadOn-Slash: /reagentcost, /rc
 
 GFWUtils.lua
 GFWTable.lua
