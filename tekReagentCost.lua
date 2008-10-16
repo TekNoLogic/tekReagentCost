@@ -1,5 +1,7 @@
 
 local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
+local buyprices = TEKRC_BUY
+TEKRC_BUY = nil
 local combineprices = {}
 
 
@@ -16,7 +18,7 @@ end
 
 local function GetPrice(itemID)
 	if not itemID then return end
-	if FRC_VendorBuyPrices[itemID] then return FRC_VendorBuyPrices[itemID], -1 end
+	if buyprices[itemID] then return buyprices[itemID], -1 end
 	local price, craftedprice = GetAuctionBuyout and GetAuctionBuyout(itemID), combineprices[itemID]
 	if price and craftedprice then return math.min(price, craftedprice), 1 end
 	return price or craftedprice, 1

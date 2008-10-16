@@ -51,21 +51,7 @@ local prices = [[
 ]]
 
 
-FRC_VendorSellPrices = setmetatable({}, {
-	__index = function(t,i)
-		local v = string.match(prices, i.." %d+ (%d+)")
-		if v then
-			t[i] = tonumber(v)
-			return tonumber(v)
-		else
-			t[i] = false
-			return
-		end
-	end,
-})
-
-
-FRC_VendorBuyPrices = setmetatable({}, {
+TEKRC_BUY = setmetatable({}, {
 	__index = function(t,i)
 		local v = string.match(prices, i.." (%d+) %d+")
 		if v then
