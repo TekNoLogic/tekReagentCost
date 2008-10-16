@@ -1,0 +1,20 @@
+## Interface: 30000
+
+## Title: tekReagentCost
+## Notes: Calculates and displays total materials cost for items in the tradeskill window.
+## Author: Tekkub Stoutwrithe
+## Version: Alpha
+## X-Website: http://www.tekkub.net/
+## X-Email: tekkub-wow@googlegroups.com
+## X-Credits: Gazmik Fizzwidget's Reagent Cost
+## X-Category: Misc
+
+## SavedVariables: FRC_Config, FRC_ReagentLinks, FRC_KnownRecipes, FRC_ItemInfoCache
+
+## OptionalDeps: tekDebug, tekErr
+
+## LoadManagers: AddonLoader
+## X-LoadOn-Crafting: true
+
+VendorPrices.lua
+tekReagentCost.lua
