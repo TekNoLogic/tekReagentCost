@@ -56,3 +56,19 @@ function f:HookTradeSkill()
 	end
 end
 
+
+local origs = {}
+local function OnTooltipSetItem(frame, ...)
+	local name, link = frame:GetItem()
+	if link then
+		local id = tonumber(link:match("item:(%d+):"))
+		if combineprices[id] then frame:AddDoubleLine("Reagent cost:", GS(combineprices[id])) end
+	end
+	if origs[frame] then return origs[frame](frame, ...) end
+end
+
+
+for _,frame in pairs{GameTooltip, ItemRefTooltip} do
+	origs[frame] = frame:GetScript("OnTooltipSetItem")
+	frame:SetScript("OnTooltipSetItem", OnTooltipSetItem)
+end
