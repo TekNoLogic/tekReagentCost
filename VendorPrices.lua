@@ -48,12 +48,17 @@ local prices = [[
 10647 2000 500 -- Engineer's Ink
 10648 500 125 -- Blank Parchment
 6217 124 24 -- Copper Rod
+
+39354 15   -- Light Parchment
+10648 125  -- Common Parchment
+39501 1250 -- Heavy Parchment
+39502 5000 -- Resilient Parchment
 ]]
 
 
 TEKRC_BUY = setmetatable({}, {
 	__index = function(t,i)
-		local v = string.match(prices, i.." (%d+) %d+")
+		local v = string.match(prices, i.." (%d+)")
 		if v then
 			t[i] = tonumber(v)
 			return tonumber(v)
