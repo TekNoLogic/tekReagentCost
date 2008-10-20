@@ -27,8 +27,7 @@ end
 
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(self, event, addon)
-	if addon == "Blizzard_CraftUI" or addon == "GFW_ReagentCost" and IsAddOnLoaded("Blizzard_CraftUI") then self:HookCraft() end
-	if addon == "Blizzard_TradeSkillUI" or addon == "GFW_ReagentCost" and IsAddOnLoaded("Blizzard_TradeSkillUI") then self:HookTradeSkill() end
+	if addon == "Blizzard_TradeSkillUI" or addon == "tekReagentCost" and IsAddOnLoaded("Blizzard_TradeSkillUI") then self:HookTradeSkill() end
 end)
 f:RegisterEvent("ADDON_LOADED")
 
@@ -57,24 +56,3 @@ function f:HookTradeSkill()
 	end
 end
 
-
-function f:HookCraft()
-	local orig = CraftFrame_Update
-	CraftFrame_Update = function(...)
-		if not GetCraftDisplaySkillLine() then return orig(...) end -- Hunters' Beast Training also uses the CraftFrame, but doesn't have a SkillLine.
-
-		local id = GetCraftSelectionIndex()
-		local cost, incomplete = 0
-		for i=1,GetCraftNumReagents(id) do
-			local link = GetCraftReagentItemLink(id, i)
-			local _, _, count = GetCraftReagentInfo(id, i)
-			local itemid = tonumber((string.match(link, "item:(%d+):")))
-			local price = GetPrice(itemid)
-			cost = cost + (price or 0) * count
-			if not price then incomplete = true end
-		end
-		CraftReagentLabel:SetText(SPELL_REAGENTS.." "..(incomplete and "Incomplete price data" or GS(cost)))
-
-		return orig(...)
-	end
-end
