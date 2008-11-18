@@ -39,18 +39,20 @@ function f:HookTradeSkill()
 		local cost, incomplete = 0
 		for i=1,GetTradeSkillNumReagents(id) do
 			local link = GetTradeSkillReagentItemLink(id, i)
-			local _, _, count = GetTradeSkillReagentInfo(id, i)
-			local itemid = tonumber((string.match(link, "item:(%d+):")))
-			local price = GetPrice(itemid)
-			cost = cost + (price or 0) * count
-			if not price then incomplete = true end
+			if link then
+				local _, _, count = GetTradeSkillReagentInfo(id, i)
+				local itemid = tonumber((string.match(link, "item:(%d+):")))
+				local price = GetPrice(itemid)
+				cost = cost + (price or 0) * count
+				if not price then incomplete = true end
+			else incomplete = true end
 		end
 		TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." "..(incomplete and "Incomplete price data" or GS(cost)))
 
 		if not incomplete then
 			local link = GetTradeSkillItemLink(id)
-			local itemid = tonumber((string.match(link, "item:(%d+):")))
-			combineprices[itemid] = cost
+			local itemid = link and tonumber((string.match(link, "item:(%d+):")))
+			if itemid then combineprices[itemid] = cost end
 		end
 		return orig(...)
 	end
