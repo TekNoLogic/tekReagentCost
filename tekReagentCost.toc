@@ -9,7 +9,7 @@
 ## X-Credits: Gazmik Fizzwidget's Reagent Cost
 ## X-Category: Misc
 
-## SavedVariables: FRC_Config, FRC_ReagentLinks, FRC_KnownRecipes, FRC_ItemInfoCache
+## SavedVariables: tekReagentCostDB
 
 ## OptionalDeps: tekDebug, tekErr
 
