@@ -13,8 +13,8 @@
 
 ## OptionalDeps: tekDebug, tekErr
 
-## LoadManagers: AddonLoader
-## X-LoadOn-Crafting: true
+## LoadOnDemand: 1
+## LoadWith: Blizzard_AuctionUI
 
 VendorPrices.lua
 data.lua
