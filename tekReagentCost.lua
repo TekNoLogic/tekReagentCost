@@ -5,7 +5,7 @@ local buyprices, combine_data = TEKRC_BUY, TEK_REAGENT_COST_DATA
 TEKRC_BUY, TEK_REAGENT_COST_DATA = nil
 
 
-local function Print(...) ChatFrame1:AddMessage(string.join(" ", "|cFF33FF99tekReagentCost|r:", ...)) end
+local function Print(...) print("|cFF33FF99tekReagentCost|r:", ...) end
 
 
 local function GS(cash)
