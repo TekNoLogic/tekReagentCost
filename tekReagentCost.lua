@@ -1,8 +1,8 @@
 
+local combineprices
 local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
-local buyprices = TEKRC_BUY
-TEKRC_BUY = nil
-local combineprices = {}
+local buyprices, combine_data = TEKRC_BUY, TEK_REAGENT_COST_DATA
+TEKRC_BUY, TEK_REAGENT_COST_DATA = nil
 
 
 local function Print(...) ChatFrame1:AddMessage(string.join(" ", "|cFF33FF99tekReagentCost|r:", ...)) end
@@ -23,6 +23,22 @@ local function GetPrice(itemID)
 	if price and craftedprice then return math.min(price, craftedprice), 1 end
 	return price or craftedprice, 1
 end
+
+
+combineprices = setmetatable({}, {__index = function(t,i)
+	local str = combine_data:match("\n("..i.."[^\n]+)")
+	if not str then return end
+	local qty, rest = str:match(i..":([%d.]+) (.+)")
+	local cost = 0
+	for id,qty2 in rest:gmatch("(%d+):(%d+)") do
+		local price = GetPrice(tonumber(id))
+		if not price then return end
+		cost = cost + price*tonumber(qty2)
+	end
+	cost = cost / tonumber(qty)
+	t[i] = cost
+	return cost
+end})
 
 
 local f = CreateFrame("Frame")

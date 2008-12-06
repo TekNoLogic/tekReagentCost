@@ -17,4 +17,5 @@
 ## X-LoadOn-Crafting: true
 
 VendorPrices.lua
+data.lua
 tekReagentCost.lua
