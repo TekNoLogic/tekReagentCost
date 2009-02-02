@@ -26,6 +26,7 @@ end
 
 
 combineprices = setmetatable({}, {__index = function(t,i)
+	t[i] = false -- Prevent overflow while we try to calculate a price
 	local str = combine_data:match("\n("..i.."[^\n]+)")
 	if not str then return end
 	local qty, rest = str:match(i..":([%d.]+) (.+)")
