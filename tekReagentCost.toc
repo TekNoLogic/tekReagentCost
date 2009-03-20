@@ -16,6 +16,9 @@
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_AuctionUI
 
+LibStub.lua
+tekIDmemo.lua
+
 VendorPrices.lua
 data.lua
 tekReagentCost.lua

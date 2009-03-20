@@ -4,6 +4,8 @@ local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
 local buyprices, combine_data = TEKRC_BUY, TEK_REAGENT_COST_DATA
 TEKRC_BUY, TEK_REAGENT_COST_DATA = nil
 
+local ids = LibStub("tekIDmemo")
+
 
 local function Print(...) print("|cFF33FF99tekReagentCost|r:", ...) end
 
@@ -30,6 +32,7 @@ combineprices = setmetatable({}, {__index = function(t,i)
 	local str = combine_data:match("\n("..i.."[^\n]+)")
 	if not str then return end
 	local qty, rest = str:match(i..":([%d.]+) (.+)")
+	if not qty then return end
 	local cost = 0
 	for id,qty2 in rest:gmatch("(%d+):(%d+)") do
 		local price = GetPrice(tonumber(id))
@@ -90,4 +93,16 @@ end
 for _,frame in pairs{GameTooltip, ItemRefTooltip} do
 	origs[frame] = frame:GetScript("OnTooltipSetItem")
 	frame:SetScript("OnTooltipSetItem", OnTooltipSetItem)
+end
+
+
+--------------------------
+--      Global API      --
+--------------------------
+
+local orig = GetReagentCost
+function GetReagentCost(item)
+	local id = ids[item]
+	if id and combineprices[id] then return combineprices[id] end
+	if orig then return orig(item) end
 end
