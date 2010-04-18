@@ -1,4 +1,4 @@
-#! /c/ruby/bin/ruby
+#!/usr/bin/env ruby
 
 require 'wowhead'
 
@@ -17,21 +17,20 @@ end
 wh = Wowhead.new
 all_data = []
 pages = [
-	"/?spells=11.171", # Alchemy
-	"/?spells=11.164", # Blacksmith
-	"/?spells=11.333", # Enchanting
-	"/?spells=11.202", # Engineering
-	"/?spells=11.773", # Inscription
-	"/?spells=11.755", # Jewelcrafting
-	"/?spells=11.165", # Leatherworking
-	"/?spells=11.186", # Mining
-	"/?spells=11.197", # Tailoring
+	"/spells=11.171", # Alchemy
+	"/spells=11.164", # Blacksmith
+	"/spells=11.333", # Enchanting
+	"/spells=11.202", # Engineering
+	"/spells=11.773", # Inscription
+	"/spells=11.755", # Jewelcrafting
+	"/spells=11.165", # Leatherworking
+	"/spells=11.186", # Mining
+	"/spells=11.197", # Tailoring
 ]
 pages.each {|page| all_data += process_list(wh.get(page, "spells"))}
 
-
-enchants = wh.get("/?spells=11.333", "spells")
-scrolls = wh.get("/?items=0.6&filter=na=Scroll+of")
+enchants = wh.get("/spells=11.333", "spells")
+scrolls = wh.get("/items=0.6&filter=na=Scroll+of")
 scrolls.map! {|i| [i["name"][11..-1], i["id"], i["level"]]}
 weapon_scrolls = scrolls.select {|i| i[0] =~ /Enchant( 2H)? Weapon/}
 enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1], e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
