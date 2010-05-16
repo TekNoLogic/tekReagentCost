@@ -31,9 +31,9 @@ pages.each {|page| all_data += process_list(wh.get(page, "spells"))}
 
 enchants = wh.get("/spells=11.333", "spells")
 scrolls = wh.get("/items=0.6&filter=na=Scroll+of")
-scrolls.map! {|i| [i["name"][11..-1], i["id"], i["level"]]}
+scrolls.map! {|i| [i["name"][11..-1].gsub(/Bracers/, "Bracer"), i["id"], i["level"]]}
 weapon_scrolls = scrolls.select {|i| i[0] =~ /Enchant( 2H)? Weapon/}
-enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1], e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
+enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1].gsub(/Bracers/, "Bracer"), e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
 all_data += scrolls.map {|s| (s + [enchants.assoc(s[0])]).flatten}.reject {|s| s.last.nil?}.map {|name,id,lvl,name2,reagents| ["#{id}:1", "#{weapon_scrolls.assoc(name) ? "43146" : "43145"}:1", reagents]}
 
 
