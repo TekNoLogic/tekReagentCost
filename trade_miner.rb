@@ -13,6 +13,10 @@ def process_list(data)
 	end
 end
 
+BLACKLIST = [
+  35622, 35623, 35624, 35625, 35627, 36860, # Eternals
+  36919, 36922, 36925, 36928, 36931, 36934, # Wrath epic gems
+]
 
 wh = Wowhead.new
 all_data = []
@@ -35,6 +39,7 @@ scrolls.map! {|i| [i["name"][11..-1].gsub(/Bracers/, "Bracer"), i["id"], i["leve
 weapon_scrolls = scrolls.select {|i| i[0] =~ /Enchant( 2H)? Weapon/}
 enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1].gsub(/Bracers/, "Bracer"), e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
 all_data += scrolls.map {|s| (s + [enchants.assoc(s[0])]).flatten}.reject {|s| s.last.nil?}.map {|name,id,lvl,name2,reagents| ["#{id}:1", "#{weapon_scrolls.assoc(name) ? "43146" : "43145"}:1", reagents]}
+all_data.reject! {|a,b| BLACKLIST.include?(a.split(":").first.to_i)}
 
 
 File.open("data.lua", "w") do |f|
