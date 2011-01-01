@@ -7,7 +7,7 @@ def process_list(data)
 	new_data = data.reject {|d| !d.has_key?("creates")}
 	new_data.map do |d|
 		vals = []
-		vals << "#{d["creates"][0]}:#{(d["creates"][1] + d["creates"][2])/2}"
+		vals << "#{d["creates"][0]}:#{[(d["creates"][1] + d["creates"][2])/2, 1].max}"
 		vals << d["reagents"].map {|r| "#{r[0]}:#{r[1]}"}
 		vals
 	end
@@ -34,11 +34,11 @@ pages = [
 pages.each {|page| all_data += process_list(wh.get(page, "spells"))}
 
 enchants = wh.get("/spells=11.333", "spells")
-scrolls = wh.get("/items=0.6&filter=na=Scroll+of")
-scrolls.map! {|i| [i["name"][11..-1].gsub(/Bracers/, "Bracer"), i["id"], i["level"]]}
-weapon_scrolls = scrolls.select {|i| i[0] =~ /Enchant( 2H)? Weapon/}
+scrolls = wh.get("/items=0.6&filter=na=Enchant")
+scrolls = scrolls.select {|i| i["name"] =~ /^\dScroll of / || i["name"] =~ /^\dEnchant /}
+scrolls.map! {|i| [i["name"].gsub(/^\d(Scroll of )?/, '').gsub(/Bracers/, "Bracer"), i["id"], i["level"]]}
 enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1].gsub(/Bracers/, "Bracer"), e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
-all_data += scrolls.map {|s| (s + [enchants.assoc(s[0])]).flatten}.reject {|s| s.last.nil?}.map {|name,id,lvl,name2,reagents| ["#{id}:1", "#{weapon_scrolls.assoc(name) ? "43146" : "43145"}:1", reagents]}
+all_data += scrolls.map {|s| (s + [enchants.assoc(s[0])]).flatten}.reject {|s| s.last.nil?}.map {|name,id,lvl,name2,reagents| ["#{id}:1", "38682:1", reagents]}
 all_data.reject! {|a,b| BLACKLIST.include?(a.split(":").first.to_i)}
 
 
