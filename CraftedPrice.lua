@@ -52,3 +52,8 @@ ns.combineprices = setmetatable({}, {__index = function(t,i)
 	t[i] = cost / tonumber(qty)
 	return cost / tonumber(qty)
 end})
+
+
+ns.RegisterEvent("AUCTION_ITEM_LIST_UPDATE", function()
+	wipe(ns.combineprices)
+end)
