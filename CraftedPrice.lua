@@ -2,6 +2,26 @@
 local myname, ns = ...
 
 
+-- Add usable items that combine or shatter, like enchanting essences
+ns.reagent_data = ns.reagent_data..[[
+10938:3 10939:1
+10939:1 10938:3
+10998:3 11082:1
+11082:1 10998:3
+11134:3 11135:1
+11135:1 11134:3
+11174:3 11175:1
+11175:1 11174:3
+16202:3 16203:1
+16203:1 16202:3
+22447:3 22446:1
+22446:1 22447:3
+34052:1 34053:3
+52721:1 52720:3
+74247:1 74252:3
+]]
+
+
 local function GetComponentPrices(str)
 	local cost = 0
 	for id,qty2 in str:gmatch("(%d+):(%d+)") do
