@@ -1,14 +1,15 @@
 #!/usr/bin/env ruby
 
-require 'wowhead'
+require './wowhead'
 
 
 def process_list(data)
 	new_data = data.reject {|d| !d.has_key?("creates")}
+	return if new_data.nil?
 	new_data.map do |d|
 		vals = []
 		vals << "#{d["creates"][0]}:#{[(d["creates"][1] + d["creates"][2])/2, 1].max}"
-		vals << d["reagents"].map {|r| "#{r[0]}:#{r[1]}"}
+		vals << d["reagents"].map {|r| "#{r[0]}:#{r[1]}"} unless d["reagents"].nil?
 		vals
 	end
 end
@@ -20,7 +21,8 @@ BLACKLIST = [
 
 wh = Wowhead.new
 all_data = []
-pages = [
+pages = []
+[
 	"/spells=11.171", # Alchemy
 	"/spells=11.164", # Blacksmith
 	"/spells=11.333", # Enchanting
@@ -30,7 +32,12 @@ pages = [
 	"/spells=11.165", # Leatherworking
 	"/spells=11.186", # Mining
 	"/spells=11.197", # Tailoring
-]
+].each do |page|
+	pages << page
+	pages << "#{page}?filter=minrs=200"
+	pages << "#{page}?filter=minrs=400"
+	pages << "#{page}?filter=minrs=600"
+end
 pages.each {|page| all_data += process_list(wh.get(page, "spells"))}
 
 enchants = wh.get("/spells=11.333", "spells")
