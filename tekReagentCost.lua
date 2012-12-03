@@ -47,7 +47,11 @@ end})
 
 local f = CreateFrame("Frame")
 f:SetScript("OnEvent", function(self, event, addon)
-	if addon == "Blizzard_TradeSkillUI" or addon == "tekReagentCost" and IsAddOnLoaded("Blizzard_TradeSkillUI") then self:HookTradeSkill() end
+	if addon == "Blizzard_TradeSkillUI"
+		or addon == "tekReagentCost" and IsAddOnLoaded("Blizzard_TradeSkillUI") then
+
+		self:HookTradeSkill()
+	end
 end)
 f:RegisterEvent("ADDON_LOADED")
 
