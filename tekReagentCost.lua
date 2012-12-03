@@ -14,7 +14,7 @@ local function GS(cash)
 	if not cash then return end
 	cash = cash/100
 	local g, s = floor(cash/100), floor(cash%100)
-	if g > 0 then return string.format("|cffffd700%d.|cffc7c7cf%02d", g, s) else return string.format("|cffc7c7cf%d", s) end
+	if g > 0 then return string.format("|cffffd700%d.|cffc7c7cf%02d|r", g, s) else return string.format("|cffc7c7cf%d|r", s) end
 end
 
 
