@@ -54,7 +54,8 @@ all_data.reject! {|a,b| BLACKLIST.include?(a.split(":").first.to_i)}
 
 File.open("data.lua", "w") do |f|
 	f << %Q|
-TEK_REAGENT_COST_DATA = [[
+local myname, ns = ...
+ns.reagent_data = [[
 #{all_data.sort.map {|v| v.join(" ")}.join("\n")}
 ]]
 |

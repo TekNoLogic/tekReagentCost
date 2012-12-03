@@ -16,9 +16,17 @@
 ## LoadOnDemand: 1
 ## LoadWith: Blizzard_AuctionUI
 
+externals\debug.lua
+externals\events.lua
+externals\gsc.lua
+externals\itemid.lua
+
 LibStub.lua
 tekIDmemo.lua
 
 VendorPrices.lua
 data.lua
+CraftedPrice.lua
+GlobalAPI.lua
+TradeSkillFrame.lua
 tekReagentCost.lua

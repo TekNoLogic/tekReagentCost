@@ -1,5 +1,6 @@
 
-TEK_REAGENT_COST_DATA = [[
+local myname, ns = ...
+ns.reagent_data = [[
 10001:1 4339:3 8343:1
 10001:1 4339:3 8343:1
 10002:1 4339:3 10285:2 8343:1

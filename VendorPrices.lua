@@ -1,4 +1,7 @@
 
+local myname, ns = ...
+
+
 local prices = [[
 159 25 1 -- Refreshing Spring Water
 1179 125 6 -- Ice Cold Milk
@@ -63,7 +66,7 @@ local prices = [[
 ]]
 
 
-TEKRC_BUY = setmetatable({}, {
+ns.vendor = setmetatable({}, {
 	__index = function(t,i)
 		local v = string.match(prices, i.." (%d+)")
 		if v then
