@@ -71,7 +71,20 @@ function f:HookTradeSkill()
 				if not price then incomplete = true end
 			else incomplete = true end
 		end
-		TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." "..(incomplete and "Incomplete price data" or GS(cost)))
+
+		local _, skillType, _, _, _, numSkillUps = GetTradeSkillInfo(id)
+		if incomplete then
+			TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." Incomplete price data")
+		else
+			if skillType == "optimal" and numSkillUps > 1 then
+				TradeSkillReagentLabel:SetText(
+					SPELL_REAGENTS.." "..GS(cost)..
+					" - "..GS(cost / numSkillUps).. " per skillup"
+				)
+			else
+				TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." ".. GS(cost))
+			end
+		end
 
 		if not incomplete then
 			local link = GetTradeSkillItemLink(id)
