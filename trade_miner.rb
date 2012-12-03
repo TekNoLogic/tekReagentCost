@@ -40,7 +40,10 @@ pages = []
 end
 pages.each {|page| all_data += process_list(wh.get(page, "spells"))}
 
-enchants = wh.get("/spells=11.333", "spells")
+enchants  = wh.get("/spells=11.333", "spells")
+enchants += wh.get("/spells=11.333?filter=minrs=200", "spells")
+enchants += wh.get("/spells=11.333?filter=minrs=400", "spells")
+enchants += wh.get("/spells=11.333?filter=minrs=600", "spells")
 scrolls = wh.get("/items=0.6&filter=na=Enchant")
 scrolls = scrolls.select {|i| i["name"] =~ /^\dScroll of / || i["name"] =~ /^\dEnchant /}
 scrolls.map! {|i| [i["name"].gsub(/^\d(Scroll of )?/, '').gsub(/Bracers/, "Bracer"), i["id"], i["level"]]}
