@@ -63,6 +63,7 @@ local prices = [[
 44501 10000000 -- Goblin-machined Piston (for Mechano-hog)
 44999 30000000 -- Salvaged Iron Golem Parts (for Mechano-hog)
 52188 3750 -- Jeweler's Setting
+38682 800 -- Enchanting Vellum
 ]]
 
 
