@@ -11,7 +11,7 @@ local function HookTradeSkill()
 		local id = GetTradeSkillSelectionIndex()
 		local cost, incomplete = 0
 		for i=1,GetTradeSkillNumReagents(id) do
-			local link = GetTradeSkillReagentItemLink(id, i)
+			local link = ns.GetTradeSkillReagentItemLink(id, i)
 			if link then
 				local _, _, count = GetTradeSkillReagentInfo(id, i)
 				local itemid = tonumber((string.match(link, "item:(%d+):")))

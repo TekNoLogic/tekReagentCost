@@ -24,6 +24,8 @@ externals\itemid.lua
 LibStub.lua
 tekIDmemo.lua
 
+Fix-5.2.lua
+
 VendorPrices.lua
 data.lua
 CraftedPrice.lua
