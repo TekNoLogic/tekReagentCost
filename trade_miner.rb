@@ -46,11 +46,16 @@ enchants += wh.get("/spells=11.333?filter=minrs=200", "listviewspells")
 enchants += wh.get("/spells=11.333?filter=minrs=400", "listviewspells")
 enchants += wh.get("/spells=11.333?filter=minrs=600", "listviewspells")
 scrolls = wh.get("/items=0.6&filter=na=Enchant", "listviewitems")
-scrolls = scrolls.select {|i| i["name"] =~ /^\dScroll of / || i["name"] =~ /^\dEnchant /}
-scrolls.map! {|i| [i["name"].gsub(/^\d(Scroll of )?/, '').gsub(/Bracers/, "Bracer"), i["id"], i["level"]]}
-enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1].gsub(/Bracers/, "Bracer"), e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
-all_data += scrolls.map {|s| (s + [enchants.assoc(s[0])]).flatten}.reject {|s| s.last.nil?}.map {|name,id,lvl,name2,reagents| ["#{id}:1", "38682:1", reagents]}
-all_data.reject! {|a,b| BLACKLIST.include?(a.split(":").first.to_i)}
+scrolls.reject! {|i| i["sourcemore"].nil? || i["sourcemore"].empty?}
+scrolls.select! {|i| i["sourcemore"].first["c"] == 11}
+scrolls.select! {|i| i["sourcemore"].first["s"] == 333}
+all_data += scrolls.map do |i|
+	spellid = i["sourcemore"].first["ti"]
+	reagents = enchants.find {|e| e["id"] == spellid}["reagents"]
+	[i["id"], "#{i["id"]}:1", "38682:1"] + reagents.map {|v| v.join ":"}
+end
+
+all_data.reject! {|a| BLACKLIST.include?(a.first)}
 
 
 File.open("data.lua", "w") do |f|
