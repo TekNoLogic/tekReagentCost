@@ -8,6 +8,7 @@ def process_list(data)
 	return if new_data.nil?
 	new_data.map do |d|
 		vals = []
+		vals << d["creates"][0]
 		vals << "#{d["creates"][0]}:#{[(d["creates"][1] + d["creates"][2])/2, 1].max}"
 		vals << d["reagents"].map {|r| "#{r[0]}:#{r[1]}"} unless d["reagents"].nil?
 		vals
@@ -56,7 +57,7 @@ File.open("data.lua", "w") do |f|
 	f << %Q|
 local myname, ns = ...
 ns.reagent_data = [[
-#{all_data.sort.map {|v| v.join(" ")}.join("\n")}
+#{all_data.uniq.sort.map {|v| v.drop(1).join(" ")}.join("\n")}
 ]]
 |
 end
