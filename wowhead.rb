@@ -60,7 +60,7 @@ class Wowhead
 
 	def get(page, list_id = "items")
 		res = fetch_page(page)
-		parse_list2($1) if res =~ /new Listview\(\{.*id: '#{list_id}', .*data: (\[\{.+\}\])\}\);/
+		parse_list2($1) if res =~ /var #{list_id} = (\[\{.+\}\]);/
 	end
 
 	def get_variable(page, variable, sanitation = true, static = true)

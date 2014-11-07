@@ -38,13 +38,13 @@ pages = []
 	pages << "#{page}?filter=minrs=400"
 	pages << "#{page}?filter=minrs=600"
 end
-pages.each {|page| all_data += process_list(wh.get(page, "spells"))}
+pages.each {|page| all_data += process_list(wh.get(page, "listviewspells"))}
 
-enchants  = wh.get("/spells=11.333", "spells")
-enchants += wh.get("/spells=11.333?filter=minrs=200", "spells")
-enchants += wh.get("/spells=11.333?filter=minrs=400", "spells")
-enchants += wh.get("/spells=11.333?filter=minrs=600", "spells")
-scrolls = wh.get("/items=0.6&filter=na=Enchant")
+enchants  = wh.get("/spells=11.333", "listviewspells")
+enchants += wh.get("/spells=11.333?filter=minrs=200", "listviewspells")
+enchants += wh.get("/spells=11.333?filter=minrs=400", "listviewspells")
+enchants += wh.get("/spells=11.333?filter=minrs=600", "listviewspells")
+scrolls = wh.get("/items=0.6&filter=na=Enchant", "listviewitems")
 scrolls = scrolls.select {|i| i["name"] =~ /^\dScroll of / || i["name"] =~ /^\dEnchant /}
 scrolls.map! {|i| [i["name"].gsub(/^\d(Scroll of )?/, '').gsub(/Bracers/, "Bracer"), i["id"], i["level"]]}
 enchants = enchants.reject {|e| e["reagents"].nil?}.map {|e| [e["name"][1..-1].gsub(/Bracers/, "Bracer"), e["reagents"].map {|r| r.join(":")}.join(" ")]} #.reject {|name,reagents| !scrolls.assoc(name)}
