@@ -16,8 +16,8 @@ def process_list(data)
 end
 
 BLACKLIST = [
-  35622, 35623, 35624, 35625, 35627, 36860, # Eternals
-  36919, 36922, 36925, 36928, 36931, 36934, # Wrath epic gems
+ 	35622, 35623, 35624, 35625, 35627, 36860, # Eternals
+ 	36919, 36922, 36925, 36928, 36931, 36934, # Wrath epic gems
 ]
 
 wh = Wowhead.new
