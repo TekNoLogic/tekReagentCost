@@ -6,8 +6,7 @@ local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
 
 
 local function HookTradeSkill()
-	local orig = TradeSkillFrame_Update
-	TradeSkillFrame_Update = function(...)
+	hooksecurefunc("TradeSkillFrame_Update", function()
 		local id = GetTradeSkillSelectionIndex()
 		local cost, incomplete = 0
 		for i=1,GetTradeSkillNumReagents(id) do
@@ -40,8 +39,7 @@ local function HookTradeSkill()
 			local itemid = link and tonumber((string.match(link, "item:(%d+):")))
 			if itemid then ns.combineprices[itemid] = cost end
 		end
-		return orig(...)
-	end
+	end)
 end
 
 

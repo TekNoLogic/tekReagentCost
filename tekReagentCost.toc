@@ -14,7 +14,7 @@
 ## OptionalDeps: tekDebug, tekErr
 
 ## LoadOnDemand: 1
-## LoadWith: Blizzard_AuctionUI
+## LoadWith: Blizzard_AuctionUI, Blizzard_TradeSkillUI
 
 externals\debug.lua
 externals\events.lua
