@@ -32,30 +32,16 @@ local function GetReagentCost(id)
 		local link = ns.GetTradeSkillReagentItemLink(id, i)
 		if link then
 			local _, _, count = GetTradeSkillReagentInfo(id, i)
-			local itemid = tonumber((string.match(link, "item:(%d+):")))
+			local itemid = ns.ids[link]
 			local price = ns.GetPrice(itemid)
 			cost = cost + (price or 0) * count
 			if not price then incomplete = true end
 		else incomplete = true end
 	end
 
-	local _, skillType, _, _, _, numSkillUps = GetTradeSkillInfo(id)
-	if incomplete then
-		TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." Incomplete price data")
-	else
-		if skillType == "optimal" and numSkillUps > 1 then
-			TradeSkillReagentLabel:SetText(
-				SPELL_REAGENTS.." "..ns.GS(cost)..
-				" - "..ns.GS(cost / numSkillUps).. " per skillup"
-			)
-		else
-			TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." ".. ns.GS(cost))
-		end
-	end
-
 	if not incomplete then
 		local link = GetTradeSkillItemLink(id)
-		local itemid = link and tonumber((string.match(link, "item:(%d+):")))
+		local itemid = link and ns.ids[link]
 		if itemid then
 			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
 		end
@@ -108,17 +94,7 @@ end
 
 local function UpdateDetailFrame()
 	local id = GetTradeSkillSelectionIndex()
-	local cost, incomplete = 0
-	for i=1,GetTradeSkillNumReagents(id) do
-		local link = ns.GetTradeSkillReagentItemLink(id, i)
-		if link then
-			local _, _, count = GetTradeSkillReagentInfo(id, i)
-			local itemid = tonumber((string.match(link, "item:(%d+):")))
-			local price = ns.GetPrice(itemid)
-			cost = cost + (price or 0) * count
-			if not price then incomplete = true end
-		else incomplete = true end
-	end
+	local cost, incomplete = GetReagentCost(GetTradeSkillSelectionIndex())
 
 	local _, skillType, _, _, _, numSkillUps = GetTradeSkillInfo(id)
 	if incomplete then
@@ -131,14 +107,6 @@ local function UpdateDetailFrame()
 			)
 		else
 			TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." ".. ns.GS(cost))
-		end
-	end
-
-	if not incomplete then
-		local link = GetTradeSkillItemLink(id)
-		local itemid = link and tonumber((string.match(link, "item:(%d+):")))
-		if itemid then
-			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
 		end
 	end
 end
