@@ -24,7 +24,30 @@ local edgecases = {
 	[111556] = 4,
 }
 local function GetNumMade(index, id)
-	return edgecases[id] or GetTradeSkillNumMade(index)
+	local _, level = GetTradeSkillLine()
+
+	-- Temporal Crystal is a unique snowflake
+	if id == 113588 then
+		if level >= 700 then
+			return 1
+		elseif level > 600 then
+			return (math.floor(3.99 + (level-600)/100*5) / 10)
+		else
+			return 3
+		end
+	end
+
+	if edgecases[id] then
+		if level >= 700 then
+			return 10
+		elseif level > 600 then
+			return math.floor(4.99 + (level-600)/100*5)
+		else
+			return 4
+		end
+	end
+
+	return GetTradeSkillNumMade(index)
 end
 
 
