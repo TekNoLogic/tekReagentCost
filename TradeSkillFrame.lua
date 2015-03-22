@@ -20,6 +20,7 @@ local edgecases = {
 	[111455] = 4,
 	[111456] = 4,
 	[111458] = 4,
+	[111556] = 4,
 }
 local function GetNumMade(index, id)
 	return edgecases[id] or GetTradeSkillNumMade(index)
