@@ -3,6 +3,7 @@ local myname, ns = ...
 
 
 local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
+local PRIMAL_SPIRIT = 120945
 
 
 local edgecases = {
@@ -28,12 +29,13 @@ end
 
 
 local function GetReagentCost(id)
-	local cost, incomplete = 0
+	local cost, incomplete, has_primal_spirit = 0
 	for i=1,GetTradeSkillNumReagents(id) do
 		local link = ns.GetTradeSkillReagentItemLink(id, i)
 		if link then
 			local _, _, count = GetTradeSkillReagentInfo(id, i)
 			local itemid = ns.ids[link]
+			if itemid == PRIMAL_SPIRIT then has_primal_spirit = true end
 			local price = ns.GetPrice(itemid)
 			cost = cost + (price or 0) * count
 			if not price then incomplete = true end
@@ -43,7 +45,7 @@ local function GetReagentCost(id)
 	if not incomplete then
 		local link = GetTradeSkillItemLink(id)
 		local itemid = link and ns.ids[link]
-		if itemid then
+		if itemid and not has_primal_spirit then
 			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
 		end
 	end
