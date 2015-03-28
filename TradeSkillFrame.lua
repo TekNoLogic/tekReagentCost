@@ -7,11 +7,17 @@ local PRIMAL_SPIRIT = 120945
 
 
 local edgecases = {
-	[108996] = 4,
-	[111366] = 4,
-	[111556] = 4,
-	[112377] = 4,
-	[115524] = 4,
+	[108257] = 4, -- Truesteel Ingot
+	[108996] = 4, -- Alchemical Catalyst
+	[109223] = 4, -- Healing Tonic
+	[110611] = 4, -- Burnished Leather
+	[111603] = 4, -- Antiseptic Bandage
+	[111366] = 4, -- Gearspring Parts
+	[111556] = 4, -- Hexweave Cloth
+	[112377] = 4, -- War Paints
+	[115524] = 4, -- Taladite Crystal
+	[116979] = 4, -- Blackwater Anti-Venom
+	[116981] = 4, -- Fire Ammonite Oil
 }
 for i=111433,111458 do edgecases[i] = 4 end -- Food!
 local function GetNumMade(index, id)
