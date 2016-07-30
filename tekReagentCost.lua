@@ -15,8 +15,8 @@ end
 local origs = {}
 local function OnTooltipSetItem(frame, ...)
 	local name, link = frame:GetItem()
-	if link then
-		local id = tonumber(link:match("item:(%d+):"))
+	local id = link and ns.ids[link]
+	if id then
 		if ns.combineprices[id] then
 			frame:AddDoubleLine("Reagent cost:", ns.GS(ns.combineprices[id]))
 		end
