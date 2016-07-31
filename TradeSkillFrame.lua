@@ -6,6 +6,7 @@ local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
 local PRIMAL_SPIRIT = 120945
 
 
+local detailcost, detailauction
 local edgecases = {
 	[108257] = 4, -- Truesteel Ingot
 	[108996] = 4, -- Alchemical Catalyst
@@ -21,7 +22,7 @@ local edgecases = {
 }
 for i=111433,111458 do edgecases[i] = 4 end -- Food!
 local function GetNumMade(index, id)
-	local _, level = GetTradeSkillLine()
+	local _, _, level = C_TradeSkillUI.GetTradeSkillLine()
 
 	-- Temporal Crystal is a unique snowflake
 	if id == 113588 then
@@ -44,16 +45,19 @@ local function GetNumMade(index, id)
 		end
 	end
 
-	return GetTradeSkillNumMade(index)
+	return C_TradeSkillUI.GetRecipeNumItemsProduced(index)
 end
 
 
 local function GetReagentCost(id)
 	local cost, incomplete, has_primal_spirit = 0
-	for i=1,GetTradeSkillNumReagents(id) do
-		local link = ns.GetTradeSkillReagentItemLink(id, i)
+	local num = C_TradeSkillUI.GetRecipeNumReagents(id)
+	if not num then return 0, true end
+
+	for i=1,num do
+		local link = C_TradeSkillUI.GetRecipeReagentItemLink(id, i)
 		if link then
-			local _, _, count = GetTradeSkillReagentInfo(id, i)
+			local _, _, count = C_TradeSkillUI.GetRecipeReagentInfo(id, i)
 			local itemid = ns.ids[link]
 			if itemid == PRIMAL_SPIRIT then has_primal_spirit = true end
 			local price = ns.GetPrice(itemid)
@@ -63,7 +67,7 @@ local function GetReagentCost(id)
 	end
 
 	if not incomplete then
-		local link = GetTradeSkillItemLink(id)
+		local link = C_TradeSkillUI.GetRecipeItemLink(id)
 		local itemid = link and ns.ids[link]
 		if itemid and not has_primal_spirit then
 			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
@@ -87,7 +91,7 @@ end
 
 
 local function UpdateList()
-	local offset = FauxScrollFrame_GetOffset(TradeSkillListScrollFrame)
+	local offset = FauxScrollFrame_GetOffset(TradeSkillFrame.RecipeList)
 
 	local filtered = TradeSkillFilterBar:IsShown()
 	local numShown = TRADE_SKILLS_DISPLAYED - (filtered and 1 or 0)
@@ -116,27 +120,55 @@ end
 
 
 local function UpdateDetailFrame()
-	local id = GetTradeSkillSelectionIndex()
-	local cost, incomplete = GetReagentCost(GetTradeSkillSelectionIndex())
+	local id = TradeSkillFrame.RecipeList:GetSelectedRecipeID()
+	if not id then return end
+	local cost, incomplete = GetReagentCost(id)
 
-	local _, skillType, _, _, _, numSkillUps = GetTradeSkillInfo(id)
+	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
 	if incomplete then
-		TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." Incomplete price data")
+		detailcost:SetText(GRAY_FONT_COLOR_CODE.. "???")
 	else
-		if skillType == "optimal" and numSkillUps > 1 then
-			TradeSkillReagentLabel:SetText(
-				SPELL_REAGENTS.." "..ns.GS(cost)..
-				" - "..ns.GS(cost / numSkillUps).. " per skillup"
-			)
+		if recipeInfo.skillType == "optimal" and recipeInfo.numSkillUps > 1 then
+			local percost = cost / recipeInfo.numSkillUps
+			detailcost:SetText(ns.GS(cost).." - "..ns.GS(percost).. " per skillup")
 		else
-			TradeSkillReagentLabel:SetText(SPELL_REAGENTS.." ".. ns.GS(cost))
+			detailcost:SetText(ns.GS(cost))
 		end
+	end
+
+	local link = C_TradeSkillUI.GetRecipeItemLink(id)
+	local itemid = link and ns.ids[link]
+	local ahprice = itemid and GetAuctionBuyout and GetAuctionBuyout(itemid)
+	if ahprice then
+		detailauction:SetText(ns.GS(ahprice))
+	else
+		detailauction:SetText(GRAY_FONT_COLOR_CODE.. "???")
 	end
 end
 
-local function HookTradeSkill()
-	hooksecurefunc("TradeSkillFrame_Update", function()
-		UpdateList()
+local function Init()
+	local parent = TradeSkillFrame.DetailsFrame.Contents
+	local f = CreateFrame("Frame", nil, parent)
+	f:SetSize(1, 1)
+	f:SetPoint("BOTTOMRIGHT", parent, "TOPRIGHT", -10, -67)
+	f:SetScript("OnShow", UpdateDetailFrame)
+
+	local auclabel = f:CreateFontString(nil, nil, "GameFontHighlightSmall")
+	auclabel:SetPoint("BOTTOMRIGHT", f)
+	auclabel:SetText("AH")
+
+	local costlabel = f:CreateFontString(nil, nil, "GameFontHighlightSmall")
+	costlabel:SetPoint("BOTTOMRIGHT", auclabel, "TOPRIGHT")
+	costlabel:SetText("Cost")
+
+	detailauction = f:CreateFontString(nil, nil, "GameFontNormalSmall")
+	detailauction:SetPoint("TOPRIGHT", costlabel, "BOTTOMLEFT", -5, 0)
+
+	detailcost = f:CreateFontString(nil, nil, "GameFontNormalSmall")
+	detailcost:SetPoint("BOTTOMRIGHT", detailauction, "TOPRIGHT")
+
+	hooksecurefunc(TradeSkillFrame.DetailsFrame, "RefreshDisplay", function()
+		-- UpdateList()
 		UpdateDetailFrame()
 	end)
 end
@@ -144,11 +176,11 @@ end
 
 function ns.OnLoad()
 	if IsAddOnLoaded("Blizzard_TradeSkillUI") then
-		HookTradeSkill()
+		Init()
 	else
 		ns.RegisterEvent("ADDON_LOADED", function(event, addon)
 			if addon == "Blizzard_TradeSkillUI" then
-				HookTradeSkill()
+				Init()
 				ns.UnregisterEvent("ADDON_LOADED")
 				ns.ADDON_LOADED = nil
 			end
