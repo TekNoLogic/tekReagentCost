@@ -53,10 +53,18 @@ class Wowhead
 
 
 	def parse_list2(raw_data)
-	  File.open("blah.json", "w") {|f| f << sanitize2(raw_data)}
-		JSON.parse(sanitize2(raw_data))
-	end
-
+    File.open("blah.json", "w") {|f| f << raw_data}
+    begin
+      JSON.parse(raw_data)
+    rescue JSON::ParserError
+      begin
+        JSON.parse(minimal_sanitize(raw_data))
+      rescue JSON::ParserError
+        JSON.parse(sanitize2(raw_data))
+      end
+    end
+  end
+  
 
 	def get(page, list_id = "items")
 		res = fetch_page(page)
