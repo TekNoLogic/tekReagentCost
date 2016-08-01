@@ -37,11 +37,11 @@ local function GetNumMade(index, id)
 
 	if edgecases[id] then
 		if level >= 700 then
-			return 10
+			return 20
 		elseif level > 600 then
-			return math.floor(4.99 + (level-600)/100*5)
+			return math.floor(8 + (level-600)/100*12)
 		else
-			return 4
+			return 8
 		end
 	end
 
