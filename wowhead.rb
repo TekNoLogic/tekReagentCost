@@ -64,7 +64,7 @@ class Wowhead
       end
     end
   end
-  
+
 
 	def get(page, list_id = "items")
 		res = fetch_page(page)
