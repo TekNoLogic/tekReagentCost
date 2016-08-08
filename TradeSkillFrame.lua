@@ -82,40 +82,27 @@ local frames = {}
 local function GetCostFrame(i)
 	if frames[i] then return frames[i] end
 
-	local butt = _G["TradeSkillSkill"..i]
-	local f = butt:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+	local f = i:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
 	f:SetPoint("LEFT", 2, 0)
 	frames[i] = f
 	return f
 end
 
 
-local function UpdateList()
-	local offset = FauxScrollFrame_GetOffset(TradeSkillFrame.RecipeList)
+local function UpdateButton(butt, info)
+	local text = GetCostFrame(butt)
 
-	local filtered = TradeSkillFilterBar:IsShown()
-	local numShown = TRADE_SKILLS_DISPLAYED - (filtered and 1 or 0)
-
-	for i=1,numShown do
-		local skillIndex = i + offset
-		local _, skillType = GetTradeSkillInfo(skillIndex)
-
-		local buttonIndex = i + (filtered and 1 or 0)
-		local text = GetCostFrame(buttonIndex)
-
-		if skillType == "header" or skillType == "subheader" then
-			text:Hide()
+	if info.type == "header" or info.type == "subheader" then
+		text:Hide()
+	else
+		local cost, incomplete = GetReagentCost(info.recipeID)
+		if incomplete then
+			text:SetText(GRAY_FONT_COLOR_CODE.."--")
 		else
-			local cost, incomplete = GetReagentCost(skillIndex)
-			if incomplete then
-				text:SetText(GRAY_FONT_COLOR_CODE.."--")
-			else
-				text:SetText(ns.GS(cost))
-			end
-			text:Show()
+			text:SetText(ns.GS(cost))
 		end
+		text:Show()
 	end
-
 end
 
 
@@ -167,10 +154,10 @@ local function Init()
 	detailcost = f:CreateFontString(nil, nil, "GameFontNormalSmall")
 	detailcost:SetPoint("BOTTOMRIGHT", detailauction, "TOPRIGHT")
 
-	hooksecurefunc(TradeSkillFrame.DetailsFrame, "RefreshDisplay", function()
-		-- UpdateList()
-		UpdateDetailFrame()
-	end)
+	hooksecurefunc(TradeSkillFrame.DetailsFrame, "RefreshDisplay", UpdateDetailFrame)
+	for i,butt in pairs(TradeSkillFrame.RecipeList.buttons) do
+		hooksecurefunc(butt, "SetUp", UpdateButton)
+	end
 end
 
 
