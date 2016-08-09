@@ -8,15 +8,15 @@ local PRIMAL_SPIRIT = 120945
 
 local detailcost, detailauction
 local edgecases = {
-	[108257] = 4, -- Truesteel Ingot
-	[108996] = 4, -- Alchemical Catalyst
+	[108257] = 8, -- Truesteel Ingot
+	[108996] = 8, -- Alchemical Catalyst
 	[109223] = 4, -- Healing Tonic
-	[110611] = 4, -- Burnished Leather
+	[110611] = 8, -- Burnished Leather
 	[111603] = 4, -- Antiseptic Bandage
-	[111366] = 4, -- Gearspring Parts
-	[111556] = 4, -- Hexweave Cloth
-	[112377] = 4, -- War Paints
-	[115524] = 4, -- Taladite Crystal
+	[111366] = 8, -- Gearspring Parts
+	[111556] = 8, -- Hexweave Cloth
+	[112377] = 8, -- War Paints
+	[115524] = 8, -- Taladite Crystal
 	[116979] = 4, -- Blackwater Anti-Venom
 	[116981] = 4, -- Fire Ammonite Oil
 }
@@ -35,13 +35,14 @@ local function GetNumMade(index, id)
 		end
 	end
 
-	if edgecases[id] then
+	local baseqty = edgecases[id]
+	if baseqty then
 		if level >= 700 then
-			return 20
+			return baseqty * 2.5
 		elseif level > 600 then
-			return math.floor(8 + (level-600)/100*12)
+			return math.floor(baseqty + (level-600)/100*baseqty*1.5)
 		else
-			return 8
+			return baseqty
 		end
 	end
 
