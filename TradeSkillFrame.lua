@@ -128,7 +128,8 @@ local function UpdateDetailFrame()
 	local itemid = link and ns.ids[link]
 	local ahprice = itemid and GetAuctionBuyout and GetAuctionBuyout(itemid)
 	if ahprice then
-		detailauction:SetText(ns.GS(ahprice))
+		local qty = GetNumMade(id, itemid) or 1
+		detailauction:SetText(ns.GS(ahprice*qty))
 	else
 		detailauction:SetText(GRAY_FONT_COLOR_CODE.. "???")
 	end
