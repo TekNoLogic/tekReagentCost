@@ -50,7 +50,7 @@ local function GetNumMade(index, id)
 end
 
 
-local function GetReagentCost(id)
+function ns.GetRecipeCost(id)
 	local cost, incomplete, has_primal_spirit = 0
 	local num = C_TradeSkillUI.GetRecipeNumReagents(id)
 	if not num then return 0, true end
@@ -100,7 +100,7 @@ local function UpdateButton(butt, info)
 	if info.type == "header" or info.type == "subheader" then
 		text:Hide()
 	else
-		local cost, incomplete = GetReagentCost(info.recipeID)
+		local cost, incomplete = ns.GetRecipeCost(info.recipeID)
 		if incomplete then
 			text:SetText(GRAY_FONT_COLOR_CODE.."--")
 		else
@@ -114,7 +114,7 @@ end
 local function UpdateDetailFrame()
 	local id = TradeSkillFrame.RecipeList:GetSelectedRecipeID()
 	if not id then return end
-	local cost, incomplete = GetReagentCost(id)
+	local cost, incomplete = ns.GetRecipeCost(id)
 
 	local recipeInfo = C_TradeSkillUI.GetRecipeInfo(id)
 	if incomplete then
