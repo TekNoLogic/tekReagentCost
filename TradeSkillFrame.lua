@@ -68,10 +68,14 @@ local function GetReagentCost(id)
 	end
 
 	if not incomplete then
-		local link = C_TradeSkillUI.GetRecipeItemLink(id)
-		local itemid = link and ns.ids[link]
-		if itemid and not has_primal_spirit then
-			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
+		ns.combineprices["recipe:"..id] = cost
+
+		if not has_primal_spirit then
+			local link = C_TradeSkillUI.GetRecipeItemLink(id)
+			local itemid = link and ns.ids[link]
+			if itemid then
+				ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
+			end
 		end
 	end
 
