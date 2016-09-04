@@ -94,23 +94,6 @@ local function GetCostFrame(i)
 end
 
 
-local function UpdateButton(butt, info)
-	local text = GetCostFrame(butt)
-
-	if info.type == "header" or info.type == "subheader" then
-		text:Hide()
-	else
-		local cost, incomplete = ns.GetRecipeCost(info.recipeID)
-		if incomplete then
-			text:SetText(GRAY_FONT_COLOR_CODE.."--")
-		else
-			text:SetText(ns.GS(cost))
-		end
-		text:Show()
-	end
-end
-
-
 local function UpdateDetailFrame()
 	local id = TradeSkillFrame.RecipeList:GetSelectedRecipeID()
 	if not id then return end
@@ -161,9 +144,6 @@ local function Init()
 	detailcost:SetPoint("BOTTOMRIGHT", detailauction, "TOPRIGHT")
 
 	hooksecurefunc(TradeSkillFrame.DetailsFrame, "RefreshDisplay", UpdateDetailFrame)
-	for i,butt in pairs(TradeSkillFrame.RecipeList.buttons) do
-		hooksecurefunc(butt, "SetUp", UpdateButton)
-	end
 end
 
 
