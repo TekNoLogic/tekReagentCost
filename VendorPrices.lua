@@ -64,6 +64,14 @@ local prices = [[
 44999 30000000 -- Salvaged Iron Golem Parts (for Mechano-hog)
 52188 3750 -- Jeweler's Setting
 38682 800 -- Enchanting Vellum
+136629 173300 -- Felgibber Shotgun
+136630 118500 -- "Twirling Bottom" Repeater
+136631 450000 -- Surface-to-Infernal Rocket Launcher
+136632 210800 -- Chaos Blaster
+136633 25000 -- Loose Trigger
+136636 57500 -- Sniping Scope
+136637 11500 -- Oversized Blasting Cap
+136638 89500 -- True Iron Barrel
 ]]
 
 
