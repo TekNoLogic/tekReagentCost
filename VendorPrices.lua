@@ -64,6 +64,12 @@ local prices = [[
 44501 10000000 -- Goblin-machined Piston (for Mechano-hog)
 44999 30000000 -- Salvaged Iron Golem Parts (for Mechano-hog)
 52188 3750 -- Jeweler's Setting
+133588 5000 -- Flaked Sea Salt
+133589 2780 -- Dalapeño Pepper
+133590 5000 -- Muskenbutter
+133591 5000 -- River Onion
+133592 5000 -- Stonedark Snail
+133593 5000 -- Royal Olive
 136629 173300 -- Felgibber Shotgun
 136630 118500 -- "Twirling Bottom" Repeater
 136631 450000 -- Surface-to-Infernal Rocket Launcher
