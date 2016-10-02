@@ -53,6 +53,7 @@ local prices = [[
 18256 30000 1500 -- Imbued Vial
 18567 150000 37500 -- Elemental Flux
 38426 30000 -- Eternium Thread
+38682 800 -- Enchanting Vellum
 39354 15   -- Light Parchment
 39501 1250 -- Heavy Parchment
 39502 5000 -- Resilient Parchment
@@ -63,7 +64,6 @@ local prices = [[
 44501 10000000 -- Goblin-machined Piston (for Mechano-hog)
 44999 30000000 -- Salvaged Iron Golem Parts (for Mechano-hog)
 52188 3750 -- Jeweler's Setting
-38682 800 -- Enchanting Vellum
 136629 173300 -- Felgibber Shotgun
 136630 118500 -- "Twirling Bottom" Repeater
 136631 450000 -- Surface-to-Infernal Rocket Launcher
