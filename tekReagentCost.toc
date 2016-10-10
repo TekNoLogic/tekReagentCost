@@ -26,6 +26,7 @@ tekIDmemo.lua
 
 Fix-7.0.lua
 
+BoundReagents.lua
 VendorPrices.lua
 data.lua
 CraftedPrice.lua

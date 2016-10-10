@@ -3,7 +3,6 @@ local myname, ns = ...
 
 
 local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
-local PRIMAL_SPIRIT = 120945
 
 
 local detailcost, detailauction
@@ -51,31 +50,34 @@ end
 
 
 function ns.GetRecipeCost(id)
-	local cost, incomplete, has_primal_spirit = 0
+	local cost, incomplete = 0
 	local num = C_TradeSkillUI.GetRecipeNumReagents(id)
 	if not num then return 0, true end
 
+	local has_bound_reagents
 	for i=1,num do
 		local link = C_TradeSkillUI.GetRecipeReagentItemLink(id, i)
 		if link then
 			local _, _, count = C_TradeSkillUI.GetRecipeReagentInfo(id, i)
 			local itemid = ns.ids[link]
-			if itemid == PRIMAL_SPIRIT then has_primal_spirit = true end
-			local price = ns.GetPrice(itemid)
-			cost = cost + (price or 0) * count
-			if not price then incomplete = true end
+			if ns.bound_reagents[itemid] then
+				has_bound_reagents = true
+			else
+				local price = ns.GetPrice(itemid)
+				cost = cost + (price or 0) * count
+				if not price then incomplete = true end
+			end
 		else incomplete = true end
 	end
 
 	if not incomplete then
 		ns.combineprices["recipe:"..id] = cost
 
-		if not has_primal_spirit then
-			local link = C_TradeSkillUI.GetRecipeItemLink(id)
-			local itemid = link and ns.ids[link]
-			if itemid then
-				ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
-			end
+		local link = C_TradeSkillUI.GetRecipeItemLink(id)
+		local itemid = link and ns.ids[link]
+		ns.has_bound_reagents[itemid] = has_bound_reagents
+		if itemid then
+			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
 		end
 	end
 

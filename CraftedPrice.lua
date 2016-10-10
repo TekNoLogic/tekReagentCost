@@ -27,13 +27,18 @@ ns.reagent_data = ns.reagent_data..[[
 
 
 local function GetComponentPrices(str)
-	local cost = 0
+	local cost, has_bound_reagents = 0
 	for id,qty2 in str:gmatch("(%d+):(%d+)") do
-		local price = ns.GetPrice(tonumber(id))
-		if not price then return end
-		cost = cost + price*tonumber(qty2)
+		id = tonumber(id)
+		if ns.bound_reagents[id] then
+			has_bound_reagents = true
+		else
+			local price = ns.GetPrice(id)
+			if not price then return end
+			cost = cost + price*tonumber(qty2)
+		end
 	end
-	return cost
+	return cost, has_bound_reagents
 end
 
 
@@ -46,7 +51,8 @@ ns.combineprices = setmetatable({}, {__index = function(t,i)
 	local qty, rest = str:match(i..":([%d.]+) (.+)")
 	if not qty then return end
 
-	local cost = GetComponentPrices(rest)
+	local cost, has_bound_reagents = GetComponentPrices(rest)
+	ns.has_bound_reagents[i] = has_bound_reagents
 	if not cost then return end
 
 	t[i] = cost / tonumber(qty)

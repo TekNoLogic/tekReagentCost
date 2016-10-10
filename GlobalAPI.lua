@@ -15,3 +15,8 @@ function GetReagentCost(item)
 	end
 	if orig then return orig(item) end
 end
+
+
+function HasBoundReagents(id)
+	return ns.has_bound_reagents[id]
+end
