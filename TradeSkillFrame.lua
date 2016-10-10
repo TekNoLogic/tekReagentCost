@@ -44,17 +44,6 @@ function ns.GetRecipeCost(id)
 end
 
 
-local frames = {}
-local function GetCostFrame(i)
-	if frames[i] then return frames[i] end
-
-	local f = i:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-	f:SetPoint("LEFT", 2, 0)
-	frames[i] = f
-	return f
-end
-
-
 local function UpdateDetailFrame()
 	local id = TradeSkillFrame.RecipeList:GetSelectedRecipeID()
 	if not id then return end
