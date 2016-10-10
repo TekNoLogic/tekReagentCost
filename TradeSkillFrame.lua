@@ -6,47 +6,6 @@ local SPELL_REAGENTS = _G.SPELL_REAGENTS:gsub("|n", "")
 
 
 local detailcost, detailauction
-local edgecases = {
-	[108257] = 8, -- Truesteel Ingot
-	[108996] = 8, -- Alchemical Catalyst
-	[109223] = 4, -- Healing Tonic
-	[110611] = 8, -- Burnished Leather
-	[111603] = 4, -- Antiseptic Bandage
-	[111366] = 8, -- Gearspring Parts
-	[111556] = 8, -- Hexweave Cloth
-	[112377] = 8, -- War Paints
-	[115524] = 8, -- Taladite Crystal
-	[116979] = 4, -- Blackwater Anti-Venom
-	[116981] = 4, -- Fire Ammonite Oil
-}
-for i=111433,111458 do edgecases[i] = 4 end -- Food!
-local function GetNumMade(index, id)
-	local _, _, level = C_TradeSkillUI.GetTradeSkillLine()
-
-	-- Temporal Crystal is a unique snowflake
-	if id == 113588 then
-		if level >= 700 then
-			return 1
-		elseif level > 600 then
-			return (math.floor(3.99 + (level-600)/100*5) / 10)
-		else
-			return 3
-		end
-	end
-
-	local baseqty = edgecases[id]
-	if baseqty then
-		if level >= 700 then
-			return baseqty * 2.5
-		elseif level > 600 then
-			return math.floor(baseqty + (level-600)/100*baseqty*1.5)
-		else
-			return baseqty
-		end
-	end
-
-	return C_TradeSkillUI.GetRecipeNumItemsProduced(index)
-end
 
 
 function ns.GetRecipeCost(id)
@@ -77,7 +36,7 @@ function ns.GetRecipeCost(id)
 		local itemid = link and ns.ids[link]
 		ns.has_bound_reagents[itemid] = has_bound_reagents
 		if itemid then
-			ns.combineprices[itemid] = cost / (GetNumMade(id, itemid) or 1)
+			ns.combineprices[itemid] = cost / (ns.GetNumMade(id, itemid) or 1)
 		end
 	end
 
@@ -117,12 +76,13 @@ local function UpdateDetailFrame()
 	local itemid = link and ns.ids[link]
 	local ahprice = itemid and GetAuctionBuyout and GetAuctionBuyout(itemid)
 	if ahprice then
-		local qty = GetNumMade(id, itemid) or 1
+		local qty = ns.GetNumMade(id, itemid) or 1
 		detailauction:SetText(ns.GS(ahprice*qty))
 	else
 		detailauction:SetText(GRAY_FONT_COLOR_CODE.. "???")
 	end
 end
+
 
 local function Init()
 	local parent = TradeSkillFrame.DetailsFrame.Contents
