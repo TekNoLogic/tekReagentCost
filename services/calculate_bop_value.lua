@@ -2,7 +2,17 @@
 local myname, ns = ...
 
 
+local PRIMAL_SPIRIT = 120945
 local BLOOD_OF_SARGERAS = 124124
+local PRIMAL_TRADES = {
+  [108996] = 1/5,  -- Alchemical Catalyst
+  [113261] = 1/15, -- Sorcerous Fire
+  [113262] = 1/15, -- Sorcerous Water
+  [113263] = 1/15, -- Sorcerous Earth
+  [113264] = 1/15, -- Sorcerous Air
+  [118472] = 1/25, -- Savage Blood
+  [127759] = 1/25, -- Felblight
+}
 local BLOOD_TRADES = {
   [123918] = 10, -- Leystone Ore
   [123919] =  5, -- Felslate
@@ -47,7 +57,9 @@ ns.bop_values = setmetatable({}, {
   __index = function(t,i)
     local v = false
 
-    if i == BLOOD_OF_SARGERAS then
+    if i == PRIMAL_SPIRIT then
+      v = GetBestTrade(PRIMAL_TRADES)
+    elseif i == BLOOD_OF_SARGERAS then
       v = GetBestTrade(BLOOD_TRADES)
     end
 
