@@ -12,7 +12,7 @@ local function GetRecipeReagentCost(recipe_id, reagent_index)
 	if not link then return end
 
 	local itemid = ns.ids[link]
-	if ns.bound_reagents[itemid] then return nil, true end
+	if ns.bound_reagents[itemid] then return ns.bop_values[itemid], true end
 
 	local price = ns.GetPrice(itemid)
 	if not price then return end
@@ -37,6 +37,7 @@ function ns.GetRecipeCost(recipe_id)
 		local price, is_bop = GetRecipeReagentCost(recipe_id, i)
 		if is_bop then
 			has_bound_reagents = true
+			if price then cost = cost + price end
 		elseif price then
 			cost = cost + price
 		else
