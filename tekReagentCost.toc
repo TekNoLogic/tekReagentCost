@@ -21,6 +21,7 @@ externals\events.lua
 externals\gsc.lua
 externals\itemid.lua
 
+services\calculate_bop_value.lua
 services\scale_draenor_bop_output.lua
 
 LibStub.lua

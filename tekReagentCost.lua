@@ -9,7 +9,7 @@ function ns.GetPrice(itemID)
 	if ns.vendor[itemID] then return ns.vendor[itemID], -1 end
 	local price = GetAuctionBuyout and GetAuctionBuyout(itemID)
 	if ah_only:match(itemID) then return price, 1 end
-	local craftedprice = ns.combineprices[itemID]
+	local craftedprice = ns.combineprices[itemID] or ns.bop_values[itemID]
 	if price and craftedprice then return math.min(price, craftedprice), 1 end
 	return price or craftedprice, 1
 end
@@ -22,6 +22,8 @@ local function OnTooltipSetItem(frame, ...)
 	if id then
 		if ns.combineprices[id] then
 			frame:AddDoubleLine("Reagent cost:", ns.GS(ns.combineprices[id]))
+		elseif ns.bop_values[id] then
+			frame:AddDoubleLine("Trade-in value:", ns.GS(ns.bop_values[id]))
 		end
 	end
 	if origs[frame] then return origs[frame](frame, ...) end
