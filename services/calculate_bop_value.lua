@@ -70,7 +70,7 @@ ns.bop_values = setmetatable({}, {
 
 
 local wiper = CreateFrame("Frame")
-frame:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+wiper:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 wiper:SetScript("OnEvent", function()
 	wipe(ns.bop_values)
 end)
